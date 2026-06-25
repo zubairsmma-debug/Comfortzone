@@ -4,6 +4,10 @@ const path = require("path");
 const crypto = require("crypto");
 const zlib = require("zlib");
 const { spawnSync } = require("child_process");
+let createClient = null;
+try {
+  ({ createClient } = require("@supabase/supabase-js"));
+} catch {}
 
 const PORT = process.env.PORT || 4173;
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4.1-mini";
@@ -24,11 +28,26 @@ const SALES_QUOTATION_PDF_SCRIPT = path.join(ROOT, "scripts", "sales_quotation_p
 const SETTINGS_FILE = path.join(DATA, "settings.json");
 const SETTINGS_UPLOADS = path.join(DATA, "settings-uploads");
 const PYTHON_EXE = process.env.PYTHON_EXE || "C:\\Users\\HP\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe";
+const SUPABASE_URL = process.env.SUPABASE_URL || "";
+const SUPABASE_KEY = process.env.SUPABASE_KEY || "";
+const SUPABASE_TABLE = process.env.SUPABASE_TABLE || "app_data";
+const SUPABASE_BUCKET = process.env.SUPABASE_BUCKET || "comfortzone-files";
 const DEFAULT_PURCHASE_NOTES = `1. Invoice should be attached with delivery note signed by site supervisor.
 2. Attach LPO copy along with invoice.
 3. Delivery to be made as per schedule instruction provided to you.`;
 
-for (const dir of [DATA, PROJECTS, UPLOADS, SETTINGS_UPLOADS]) fs.mkdirSync(dir, { recursive: true });
+if ((SUPABASE_URL || SUPABASE_KEY) && !createClient) {
+  throw new Error("Supabase environment variables are set, but @supabase/supabase-js is not installed.");
+}
+
+const supabase = SUPABASE_URL && SUPABASE_KEY && createClient
+  ? createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { persistSession: false } })
+  : null;
+const USE_SUPABASE = !!supabase;
+
+if (!USE_SUPABASE) {
+  for (const dir of [DATA, PROJECTS, UPLOADS, SETTINGS_UPLOADS]) fs.mkdirSync(dir, { recursive: true });
+}
 
 const sessions = new Map();
 
@@ -62,6 +81,107 @@ function verifyPassword(password, stored) {
   if (!salt || !hash) return false;
   const check = passwordHash(password, salt).split(":")[1];
   return crypto.timingSafeEqual(Buffer.from(hash, "hex"), Buffer.from(check, "hex"));
+}
+
+function localReadJson(file, fallbackFactory, normalize = value => value) {
+  if (!fs.existsSync(file)) return normalize(fallbackFactory());
+  try {
+    return normalize(JSON.parse(fs.readFileSync(file, "utf8")));
+  } catch {
+    return normalize(fallbackFactory());
+  }
+}
+
+async function readSupabaseValue(key) {
+  const { data, error } = await supabase
+    .from(SUPABASE_TABLE)
+    .select("value")
+    .eq("key", key)
+    .maybeSingle();
+  if (error) throw new Error(`Supabase read failed for ${key}: ${error.message}`);
+  return data ? data.value : null;
+}
+
+async function writeSupabaseValue(key, value) {
+  const { error } = await supabase
+    .from(SUPABASE_TABLE)
+    .upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: "key" });
+  if (error) throw new Error(`Supabase write failed for ${key}: ${error.message}`);
+}
+
+async function readStore(key, file, fallbackFactory, normalize = value => value) {
+  if (USE_SUPABASE) {
+    const value = await readSupabaseValue(key);
+    if (value === null || value === undefined) {
+      const seed = normalize(fallbackFactory());
+      await writeSupabaseValue(key, seed);
+      return seed;
+    }
+    return normalize(value);
+  }
+  return localReadJson(file, fallbackFactory, normalize);
+}
+
+async function writeStore(key, file, value) {
+  if (USE_SUPABASE) {
+    await writeSupabaseValue(key, value);
+    return;
+  }
+  fs.writeFileSync(file, JSON.stringify(value, null, 2));
+}
+
+function storagePath(scope, storedName) {
+  return `${String(scope || "uploads").replace(/^\/+|\/+$/g, "")}/${storedName}`;
+}
+
+function localUploadPath(scope, storedName) {
+  return path.join(UPLOADS, ...String(scope || "uploads").split("/"), storedName);
+}
+
+async function saveUpload(scope, storedName, body, mimeType) {
+  if (USE_SUPABASE) {
+    const { error } = await supabase.storage
+      .from(SUPABASE_BUCKET)
+      .upload(storagePath(scope, storedName), body, {
+        contentType: mimeType || "application/octet-stream",
+        upsert: true
+      });
+    if (error) throw new Error(`Supabase upload failed: ${error.message}`);
+    return;
+  }
+  const file = localUploadPath(scope, storedName);
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, body);
+}
+
+async function readUpload(scope, storedName) {
+  if (USE_SUPABASE) {
+    const { data, error } = await supabase.storage.from(SUPABASE_BUCKET).download(storagePath(scope, storedName));
+    if (error) throw new Error(`Supabase download failed: ${error.message}`);
+    return Buffer.from(await data.arrayBuffer());
+  }
+  const file = localUploadPath(scope, storedName);
+  if (!fs.existsSync(file)) return null;
+  return fs.readFileSync(file);
+}
+
+async function deleteUpload(scope, storedName) {
+  if (!storedName) return;
+  if (USE_SUPABASE) {
+    await supabase.storage.from(SUPABASE_BUCKET).remove([storagePath(scope, storedName)]);
+    return;
+  }
+  fs.rmSync(localUploadPath(scope, storedName), { force: true });
+}
+
+async function sendStoredUpload(res, upload, scope) {
+  const bytes = await readUpload(scope, upload.storedName);
+  if (!bytes) return notFound(res);
+  res.writeHead(200, {
+    "Content-Type": upload.mimeType || "application/octet-stream",
+    "Content-Disposition": `inline; filename="${upload.originalName.replace(/"/g, "")}"`
+  });
+  return res.end(bytes);
 }
 
 function defaultSettings() {
@@ -98,32 +218,26 @@ function defaultSettings() {
   };
 }
 
-function readSettings() {
-  if (!fs.existsSync(SETTINGS_FILE)) {
-    const seed = defaultSettings();
-    writeSettings(seed);
-    return seed;
-  }
-  try {
-    const parsed = JSON.parse(fs.readFileSync(SETTINGS_FILE, "utf8"));
-    const fallback = defaultSettings();
-    const settings = {
-      ...fallback,
-      ...parsed,
-      company: { ...fallback.company, ...(parsed.company || {}) },
-      company2: { ...fallback.company2, ...(parsed.company2 || {}) },
-      users: Array.isArray(parsed.users) && parsed.users.length ? parsed.users : fallback.users,
-      attachments: Array.isArray(parsed.attachments) ? parsed.attachments : []
-    };
-    if (!settings.users.some(user => String(user.role).toLowerCase() === "admin")) settings.users.unshift(fallback.users[0]);
-    return settings;
-  } catch {
-    return defaultSettings();
-  }
+function normalizeSettings(parsed = {}) {
+  const fallback = defaultSettings();
+  const settings = {
+    ...fallback,
+    ...parsed,
+    company: { ...fallback.company, ...(parsed.company || {}) },
+    company2: { ...fallback.company2, ...(parsed.company2 || {}) },
+    users: Array.isArray(parsed.users) && parsed.users.length ? parsed.users : fallback.users,
+    attachments: Array.isArray(parsed.attachments) ? parsed.attachments : []
+  };
+  if (!settings.users.some(user => String(user.role).toLowerCase() === "admin")) settings.users.unshift(fallback.users[0]);
+  return settings;
 }
 
-function writeSettings(settings) {
-  fs.writeFileSync(SETTINGS_FILE, JSON.stringify(settings, null, 2));
+async function readSettings() {
+  return readStore("settings", SETTINGS_FILE, defaultSettings, normalizeSettings);
+}
+
+async function writeSettings(settings) {
+  await writeStore("settings", SETTINGS_FILE, settings);
 }
 
 function publicSettings(settings) {
@@ -143,11 +257,11 @@ function parseCookies(req) {
   }));
 }
 
-function sessionUser(req) {
+async function sessionUser(req) {
   const token = parseCookies(req).cz_session;
   if (!token || !sessions.has(token)) return null;
   const session = sessions.get(token);
-  const settings = readSettings();
+  const settings = await readSettings();
   const user = (settings.users || []).find(item => item.id === session.userId && item.active !== false);
   if (!user) {
     sessions.delete(token);
@@ -172,15 +286,33 @@ function projectPath(projectId) {
   return path.join(PROJECTS, `${projectId}.json`);
 }
 
-function readProject(projectId) {
+async function readProject(projectId) {
+  if (USE_SUPABASE) {
+    const value = await readSupabaseValue(`project:${projectId}`);
+    return value ? hydrateProject(value) : null;
+  }
   const file = projectPath(projectId);
   if (!fs.existsSync(file)) return null;
   return hydrateProject(JSON.parse(fs.readFileSync(file, "utf8")));
 }
 
-function writeProject(project) {
+async function writeProject(project) {
   project.updatedAt = new Date().toISOString();
+  if (USE_SUPABASE) {
+    await writeSupabaseValue(`project:${project.id}`, project);
+    return;
+  }
   fs.writeFileSync(projectPath(project.id), JSON.stringify(project, null, 2));
+}
+
+async function deleteProject(projectId) {
+  if (USE_SUPABASE) {
+    const { error } = await supabase.from(SUPABASE_TABLE).delete().eq("key", `project:${projectId}`);
+    if (error) throw new Error(`Supabase delete failed for project:${projectId}: ${error.message}`);
+    return;
+  }
+  const file = projectPath(projectId);
+  if (fs.existsSync(file)) fs.unlinkSync(file);
 }
 
 function defaultInventory() {
@@ -194,21 +326,16 @@ function defaultInventory() {
   };
 }
 
-function readInventory() {
-  if (!fs.existsSync(INVENTORY_FILE)) {
-    const seed = defaultInventory();
-    writeInventory(seed);
-    return seed;
-  }
-  try {
-    return { ...defaultInventory(), ...JSON.parse(fs.readFileSync(INVENTORY_FILE, "utf8")) };
-  } catch {
-    return defaultInventory();
-  }
+function normalizeInventory(parsed = {}) {
+  return { ...defaultInventory(), ...parsed };
 }
 
-function writeInventory(inventory) {
-  fs.writeFileSync(INVENTORY_FILE, JSON.stringify(inventory, null, 2));
+async function readInventory() {
+  return readStore("inventory", INVENTORY_FILE, defaultInventory, normalizeInventory);
+}
+
+async function writeInventory(inventory) {
+  await writeStore("inventory", INVENTORY_FILE, inventory);
 }
 
 function defaultPurchaseOrders() {
@@ -220,31 +347,25 @@ function defaultPurchaseOrders() {
   };
 }
 
-function readPurchaseOrders() {
-  if (!fs.existsSync(PURCHASE_ORDERS_FILE)) {
-    const seed = defaultPurchaseOrders();
-    writePurchaseOrders(seed);
-    return seed;
-  }
-  try {
-    const parsed = JSON.parse(fs.readFileSync(PURCHASE_ORDERS_FILE, "utf8"));
-    const store = {
-      ...defaultPurchaseOrders(),
-      ...parsed,
-      settings: { ...defaultPurchaseOrders().settings, ...(parsed.settings || {}) },
-      orders: Array.isArray(parsed.orders) ? parsed.orders : [],
-      suppliers: Array.isArray(parsed.suppliers) ? parsed.suppliers : [],
-      uploads: Array.isArray(parsed.uploads) ? parsed.uploads : []
-    };
-    store.settings.nextPoNo = nextPurchaseNoFromOrders(store.orders);
-    return store;
-  } catch {
-    return defaultPurchaseOrders();
-  }
+function normalizePurchaseOrders(parsed = {}) {
+  const store = {
+    ...defaultPurchaseOrders(),
+    ...parsed,
+    settings: { ...defaultPurchaseOrders().settings, ...(parsed.settings || {}) },
+    orders: Array.isArray(parsed.orders) ? parsed.orders : [],
+    suppliers: Array.isArray(parsed.suppliers) ? parsed.suppliers : [],
+    uploads: Array.isArray(parsed.uploads) ? parsed.uploads : []
+  };
+  store.settings.nextPoNo = nextPurchaseNoFromOrders(store.orders);
+  return store;
 }
 
-function writePurchaseOrders(store) {
-  fs.writeFileSync(PURCHASE_ORDERS_FILE, JSON.stringify(store, null, 2));
+async function readPurchaseOrders() {
+  return readStore("purchase-orders", PURCHASE_ORDERS_FILE, defaultPurchaseOrders, normalizePurchaseOrders);
+}
+
+async function writePurchaseOrders(store) {
+  await writeStore("purchase-orders", PURCHASE_ORDERS_FILE, store);
 }
 
 function defaultSalesCrm() {
@@ -279,30 +400,24 @@ function defaultSalesCrm() {
   };
 }
 
-function readSalesCrm() {
-  if (!fs.existsSync(SALES_CRM_FILE)) {
-    const seed = defaultSalesCrm();
-    writeSalesCrm(seed);
-    return seed;
-  }
-  try {
-    const parsed = JSON.parse(fs.readFileSync(SALES_CRM_FILE, "utf8"));
-    const fallback = defaultSalesCrm();
-    return {
-      settings: { ...fallback.settings, ...(parsed.settings || {}) },
-      leads: Array.isArray(parsed.leads) ? parsed.leads : fallback.leads,
-      customers: Array.isArray(parsed.customers) ? parsed.customers : fallback.customers,
-      projects: Array.isArray(parsed.projects) ? parsed.projects : fallback.projects,
-      quotations: Array.isArray(parsed.quotations) ? parsed.quotations : fallback.quotations,
-      followUps: Array.isArray(parsed.followUps) ? parsed.followUps : fallback.followUps
-    };
-  } catch {
-    return defaultSalesCrm();
-  }
+function normalizeSalesCrm(parsed = {}) {
+  const fallback = defaultSalesCrm();
+  return {
+    settings: { ...fallback.settings, ...(parsed.settings || {}) },
+    leads: Array.isArray(parsed.leads) ? parsed.leads : fallback.leads,
+    customers: Array.isArray(parsed.customers) ? parsed.customers : fallback.customers,
+    projects: Array.isArray(parsed.projects) ? parsed.projects : fallback.projects,
+    quotations: Array.isArray(parsed.quotations) ? parsed.quotations : fallback.quotations,
+    followUps: Array.isArray(parsed.followUps) ? parsed.followUps : fallback.followUps
+  };
 }
 
-function writeSalesCrm(store) {
-  fs.writeFileSync(SALES_CRM_FILE, JSON.stringify(store, null, 2));
+async function readSalesCrm() {
+  return readStore("sales-crm", SALES_CRM_FILE, defaultSalesCrm, normalizeSalesCrm);
+}
+
+async function writeSalesCrm(store) {
+  await writeStore("sales-crm", SALES_CRM_FILE, store);
 }
 
 function salesCustomerToInventoryCustomer(customer, existing = null) {
@@ -362,34 +477,34 @@ function mergedSalesCustomers(salesCustomers = [], inventoryCustomers = []) {
   return merged.sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")));
 }
 
-function salesCrmView(store) {
-  const inventory = readInventory();
+async function salesCrmView(store) {
+  const inventory = await readInventory();
   return {
     ...store,
     customers: mergedSalesCustomers(store.customers || [], inventory.customers || [])
   };
 }
 
-function syncSalesCustomerToInventory(customer) {
+async function syncSalesCustomerToInventory(customer) {
   if (!customer?.name) return;
-  const inventory = readInventory();
+  const inventory = await readInventory();
   const existingIndex = (inventory.customers || []).findIndex(item => item.id === customer.id || inventoryNorm(item.customerName) === inventoryNorm(customer.name));
   const existing = existingIndex >= 0 ? inventory.customers[existingIndex] : null;
   const next = salesCustomerToInventoryCustomer(customer, existing);
   if (existingIndex >= 0) inventory.customers[existingIndex] = next;
   else inventory.customers.push(next);
-  writeInventory(inventory);
+  await writeInventory(inventory);
 }
 
-function syncInventoryCustomerToSales(customer) {
+async function syncInventoryCustomerToSales(customer) {
   if (!customer?.customerName) return;
-  const store = readSalesCrm();
+  const store = await readSalesCrm();
   const existingIndex = (store.customers || []).findIndex(item => item.id === customer.id || inventoryNorm(item.name) === inventoryNorm(customer.customerName));
   const existing = existingIndex >= 0 ? store.customers[existingIndex] : null;
   const next = inventoryCustomerToSalesCustomer(customer, existing);
   if (existingIndex >= 0) store.customers[existingIndex] = next;
   else store.customers.unshift(next);
-  writeSalesCrm(store);
+  await writeSalesCrm(store);
 }
 
 function mergeDuplicateSalesCustomers(customers = []) {
@@ -475,7 +590,7 @@ async function readJson(req) {
   return JSON.parse(buffer.toString("utf8"));
 }
 
-function createDefaultProject() {
+async function createDefaultProject() {
   const now = new Date();
   const yyyy = now.getFullYear();
   const mm = String(now.getMonth() + 1).padStart(2, "0");
@@ -500,7 +615,7 @@ function createDefaultProject() {
       enquiryNo: "",
       preparedBy: ""
     },
-    quotation: { quotationNo: nextQuotationNo(), generatedDocId: "", generatedPdfId: "" },
+    quotation: { quotationNo: await nextQuotationNo(), generatedDocId: "", generatedPdfId: "" },
     layoutVersion: "screenshot-v3",
     nodes: defaultNodes(),
     uploads: [],
@@ -515,13 +630,12 @@ function createDefaultProject() {
   };
 }
 
-function nextQuotationNo() {
-  const files = fs.readdirSync(PROJECTS).filter(file => file.endsWith(".json"));
+async function nextQuotationNo() {
+  const projects = await listProjects("", true);
   let max = 1000;
   const year = String(new Date().getFullYear()).slice(-2);
-  for (const file of files) {
+  for (const project of projects) {
     try {
-      const project = JSON.parse(fs.readFileSync(path.join(PROJECTS, file), "utf8"));
       const q = project.quotation && project.quotation.quotationNo;
       const match = typeof q === "string" && q.match(/(\d+)$/);
       if (match) max = Math.max(max, Number(match[1]));
@@ -588,12 +702,23 @@ function defaultOutdoorData() {
   ];
 }
 
-function listProjects(query = "") {
+async function listProjects(query = "", includeHidden = false) {
   const q = query.toLowerCase();
-  return fs.readdirSync(PROJECTS)
-    .filter(file => file.endsWith(".json"))
-    .map(file => JSON.parse(fs.readFileSync(path.join(PROJECTS, file), "utf8")))
-    .filter(project => project.visible !== false)
+  let projects = [];
+  if (USE_SUPABASE) {
+    const { data, error } = await supabase
+      .from(SUPABASE_TABLE)
+      .select("value")
+      .like("key", "project:%");
+    if (error) throw new Error(`Supabase project list failed: ${error.message}`);
+    projects = (data || []).map(row => row.value).filter(Boolean).map(hydrateProject);
+  } else {
+    projects = fs.readdirSync(PROJECTS)
+      .filter(file => file.endsWith(".json"))
+      .map(file => JSON.parse(fs.readFileSync(path.join(PROJECTS, file), "utf8")));
+  }
+  const filtered = projects
+    .filter(project => includeHidden || project.visible !== false)
     .filter(project => {
       if (!q) return true;
       const haystack = [
@@ -607,7 +732,9 @@ function listProjects(query = "") {
         project.quotation.quotationNo
       ].join(" ").toLowerCase();
       return haystack.includes(q);
-    })
+    });
+  if (includeHidden) return filtered;
+  return filtered
     .map(project => ({
       id: project.id,
       title: project.title,
@@ -805,16 +932,16 @@ function serveStatic(req, res) {
 async function handleApi(req, res) {
   const url = new URL(req.url, `http://${req.headers.host}`);
   const parts = url.pathname.split("/").filter(Boolean);
-  const user = sessionUser(req);
+  const user = await sessionUser(req);
 
   if (req.method === "GET" && url.pathname === "/api/auth/me") {
-    const settings = readSettings();
+    const settings = await readSettings();
     return send(res, 200, { user, settings: publicSettings(settings) });
   }
 
   if (req.method === "POST" && url.pathname === "/api/auth/login") {
     const body = await readJson(req);
-    const settings = readSettings();
+    const settings = await readSettings();
     const matched = (settings.users || []).find(item => cleanCell(item.email).toLowerCase() === cleanCell(body.email).toLowerCase() && item.active !== false);
     if (!matched || !verifyPassword(body.password, matched.passwordHash)) return send(res, 401, { error: "Invalid email or password" });
     const token = crypto.randomBytes(32).toString("hex");
@@ -839,13 +966,13 @@ async function handleApi(req, res) {
   if (!user) return sendAuthRequired(res);
 
   if (req.method === "GET" && url.pathname === "/api/settings") {
-    return send(res, 200, { user, settings: publicSettings(readSettings()) });
+    return send(res, 200, { user, settings: publicSettings(await readSettings()) });
   }
 
   if (req.method === "PUT" && url.pathname === "/api/settings/company") {
     if (!isAdmin(user)) return sendForbidden(res);
     const body = await readJson(req);
-    const settings = readSettings();
+    const settings = await readSettings();
     const key = body.companyKey === "company2" ? "company2" : "company";
     settings[key] = {
       ...settings[key],
@@ -857,14 +984,14 @@ async function handleApi(req, res) {
       website: cleanCell(body.website || ""),
       logoUploadId: cleanCell(body.logoUploadId || settings[key].logoUploadId || "")
     };
-    writeSettings(settings);
+    await writeSettings(settings);
     return send(res, 200, { user, settings: publicSettings(settings) });
   }
 
   if (req.method === "POST" && url.pathname === "/api/settings/users") {
     if (!isAdmin(user)) return sendForbidden(res);
     const body = await readJson(req);
-    const settings = readSettings();
+    const settings = await readSettings();
     const email = cleanCell(body.email || "").toLowerCase();
     if (!email) return send(res, 400, { error: "Email is required" });
     const existing = body.id
@@ -881,7 +1008,7 @@ async function handleApi(req, res) {
     } else {
       settings.users.push(nextUser);
     }
-    writeSettings(settings);
+    await writeSettings(settings);
     return send(res, 200, { user, settings: publicSettings(settings) });
   }
 
@@ -889,9 +1016,9 @@ async function handleApi(req, res) {
     if (!isAdmin(user)) return sendForbidden(res);
     const userId = decodeURIComponent(parts[3]);
     if (userId === user.id) return send(res, 400, { error: "You cannot delete your own admin login" });
-    const settings = readSettings();
+    const settings = await readSettings();
     settings.users = (settings.users || []).filter(item => item.id !== userId);
-    writeSettings(settings);
+    await writeSettings(settings);
     return send(res, 200, { user, settings: publicSettings(settings) });
   }
 
@@ -903,8 +1030,8 @@ async function handleApi(req, res) {
     if (!filePart) return send(res, 400, { error: "No file uploaded" });
     const uploadId = id();
     const storedName = `${uploadId}-${safeName(filePart.filename)}`;
-    fs.writeFileSync(path.join(SETTINGS_UPLOADS, storedName), filePart.body);
-    const settings = readSettings();
+    await saveUpload("settings", storedName, filePart.body, filePart.mimeType);
+    const settings = await readSettings();
     const upload = {
       id: uploadId,
       originalName: filePart.filename,
@@ -917,62 +1044,56 @@ async function handleApi(req, res) {
     settings.attachments.unshift(upload);
     const targetCompany = cleanCell(multipart.find(part => part.name === "companyKey")?.body.toString("utf8"));
     if (upload.category === "Logo" && ["company", "company2"].includes(targetCompany)) settings[targetCompany].logoUploadId = upload.id;
-    writeSettings(settings);
+    await writeSettings(settings);
     return send(res, 201, { upload, settings: publicSettings(settings) });
   }
 
   if (req.method === "GET" && url.pathname.match(/^\/api\/settings\/uploads\/[^/]+$/)) {
-    const settings = readSettings();
+    const settings = await readSettings();
     const upload = (settings.attachments || []).find(item => item.id === decodeURIComponent(parts[3]));
     if (!upload) return notFound(res);
-    const file = path.join(SETTINGS_UPLOADS, upload.storedName);
-    if (!fs.existsSync(file)) return notFound(res);
-    res.writeHead(200, {
-      "Content-Type": upload.mimeType || "application/octet-stream",
-      "Content-Disposition": `inline; filename="${upload.originalName.replace(/"/g, "")}"`
-    });
-    return res.end(fs.readFileSync(file));
+    return sendStoredUpload(res, upload, "settings");
   }
 
   if (req.method === "DELETE" && url.pathname.match(/^\/api\/settings\/uploads\/[^/]+$/)) {
     if (!isAdmin(user)) return sendForbidden(res);
-    const settings = readSettings();
+    const settings = await readSettings();
     const uploadId = decodeURIComponent(parts[3]);
     const upload = (settings.attachments || []).find(item => item.id === uploadId);
     settings.attachments = (settings.attachments || []).filter(item => item.id !== uploadId);
     for (const key of ["company", "company2"]) if (settings[key].logoUploadId === uploadId) settings[key].logoUploadId = "";
-    if (upload) fs.rmSync(path.join(SETTINGS_UPLOADS, upload.storedName), { force: true });
-    writeSettings(settings);
+    if (upload) await deleteUpload("settings", upload.storedName);
+    await writeSettings(settings);
     return send(res, 200, { user, settings: publicSettings(settings) });
   }
 
   if (req.method === "GET" && url.pathname === "/api/projects") {
-    return send(res, 200, listProjects(url.searchParams.get("q") || ""));
+    return send(res, 200, await listProjects(url.searchParams.get("q") || ""));
   }
 
   if (req.method === "POST" && url.pathname === "/api/projects") {
-    const project = createDefaultProject();
+    const project = await createDefaultProject();
     if (url.searchParams.get("draft") === "1") {
       return send(res, 200, project);
     }
-    writeProject(project);
+    await writeProject(project);
     return send(res, 201, project);
   }
 
   if (req.method === "GET" && url.pathname === "/api/inventory") {
-    return send(res, 200, inventoryView(readInventory()));
+    return send(res, 200, await inventoryView(await readInventory()));
   }
 
   if (req.method === "GET" && url.pathname === "/api/purchase-orders") {
-    return send(res, 200, purchaseOrderView(readPurchaseOrders()));
+    return send(res, 200, purchaseOrderView(await readPurchaseOrders()));
   }
 
   if (req.method === "GET" && url.pathname === "/api/sales-crm") {
-    return send(res, 200, salesCrmView(readSalesCrm()));
+    return send(res, 200, await salesCrmView(await readSalesCrm()));
   }
 
   if (req.method === "POST" && url.pathname === "/api/sales-crm/quotations/pdf") {
-    const store = readSalesCrm();
+    const store = await readSalesCrm();
     const body = await readJson(req);
     const sourceQuote = body.quoteId
       ? (store.quotations || []).find(item => item.id === body.quoteId)
@@ -989,7 +1110,7 @@ async function handleApi(req, res) {
   }
 
   if (req.method === "POST" && url.pathname.match(/^\/api\/sales-crm\/(leads|customers|projects|quotations|followUps)$/)) {
-    const store = readSalesCrm();
+    const store = await readSalesCrm();
     const collection = url.pathname.split("/").pop();
     const body = await readJson(req);
     const item = normalizeSalesItem(collection, body.item || body, store);
@@ -1009,33 +1130,33 @@ async function handleApi(req, res) {
     if (collection === "leads" && item.enquiryNo) {
       store.settings.nextEnquiryNo = nextSalesEnquiryNoFrom(item.enquiryNo);
     }
-    writeSalesCrm(store);
-    if (collection === "customers") syncSalesCustomerToInventory(item);
-    return send(res, 200, salesCrmView(store));
+    await writeSalesCrm(store);
+    if (collection === "customers") await syncSalesCustomerToInventory(item);
+    return send(res, 200, await salesCrmView(store));
   }
 
   if (req.method === "DELETE" && url.pathname.match(/^\/api\/sales-crm\/(leads|customers|projects|quotations|followUps)\/[^/]+$/)) {
-    const store = readSalesCrm();
+    const store = await readSalesCrm();
     const parts = url.pathname.split("/");
     const collection = parts[3];
     const itemId = decodeURIComponent(parts[4]);
     const deletedItem = (store[collection] || []).find(item => item.id === itemId);
     store[collection] = (store[collection] || []).filter(item => item.id !== itemId);
-    writeSalesCrm(store);
+    await writeSalesCrm(store);
     if (collection === "customers" && deletedItem) {
-      const inventory = readInventory();
+      const inventory = await readInventory();
       inventory.customers = (inventory.customers || []).filter(customer => inventoryNorm(customer.customerName) !== inventoryNorm(deletedItem.name));
-      writeInventory(inventory);
+      await writeInventory(inventory);
     } else if (collection === "customers") {
-      const inventory = readInventory();
+      const inventory = await readInventory();
       inventory.customers = (inventory.customers || []).filter(customer => customer.id !== itemId);
-      writeInventory(inventory);
+      await writeInventory(inventory);
     }
-    return send(res, 200, salesCrmView(store));
+    return send(res, 200, await salesCrmView(store));
   }
 
   if (req.method === "POST" && url.pathname === "/api/purchase-orders/suppliers") {
-    const store = readPurchaseOrders();
+    const store = await readPurchaseOrders();
     const body = await readJson(req);
     const supplier = normalizePurchaseSupplier(body);
     if (!supplier.supplierName) return send(res, 400, { error: "Supplier Name is required" });
@@ -1047,31 +1168,29 @@ async function handleApi(req, res) {
     } else {
       store.suppliers.unshift(supplier);
     }
-    writePurchaseOrders(store);
+    await writePurchaseOrders(store);
     return send(res, 200, purchaseOrderView(store));
   }
 
   if (req.method === "DELETE" && url.pathname.match(/^\/api\/purchase-orders\/suppliers\/[^/]+$/)) {
-    const store = readPurchaseOrders();
+    const store = await readPurchaseOrders();
     const supplierId = decodeURIComponent(url.pathname.split("/").pop());
     store.suppliers = (store.suppliers || []).filter(supplier => supplier.id !== supplierId);
-    writePurchaseOrders(store);
+    await writePurchaseOrders(store);
     return send(res, 200, purchaseOrderView(store));
   }
 
   if (req.method === "POST" && url.pathname === "/api/purchase-orders/upload-quotation") {
-    const store = readPurchaseOrders();
+    const store = await readPurchaseOrders();
     const buffer = await collect(req);
     const multipart = parseMultipart(buffer, req.headers["content-type"] || "");
     const filePart = multipart.find(part => part.filename);
     if (!filePart) return send(res, 400, { error: "No quotation uploaded" });
     const uploadId = id();
-    const dir = path.join(UPLOADS, "purchase-orders");
-    fs.mkdirSync(dir, { recursive: true });
     const storedName = `${uploadId}-${safeName(filePart.filename)}`;
-    fs.writeFileSync(path.join(dir, storedName), filePart.body);
+    await saveUpload("purchase-orders", storedName, filePart.body, filePart.mimeType);
     store.uploads.unshift({ id: uploadId, originalName: filePart.filename, storedName, mimeType: filePart.mimeType, size: filePart.body.length, createdAt: new Date().toISOString() });
-    writePurchaseOrders(store);
+    await writePurchaseOrders(store);
     const extracted = await extractPurchaseQuotationWithOpenAI(filePart).catch(error => ({ message: error.message, items: [] }));
     const order = normalizePurchaseOrder({ ...extracted, sourceUploadId: uploadId, status: "Draft" }, store, false);
     order.id = "";
@@ -1080,7 +1199,7 @@ async function handleApi(req, res) {
   }
 
   if (req.method === "POST" && url.pathname === "/api/purchase-orders") {
-    const store = readPurchaseOrders();
+    const store = await readPurchaseOrders();
     const body = await readJson(req);
     const order = normalizePurchaseOrder(body.order || body, store, !!body.createOfficial);
     const existingIndex = store.orders.findIndex(item => item.id === order.id);
@@ -1093,22 +1212,22 @@ async function handleApi(req, res) {
     if (body.createOfficial) order.status = "Created";
     if (existingIndex >= 0) store.orders[existingIndex] = order;
     else store.orders.unshift(order);
-    writePurchaseOrders(store);
+    await writePurchaseOrders(store);
     return send(res, 200, { state: purchaseOrderView(store), order });
   }
 
   if (req.method === "DELETE" && url.pathname.match(/^\/api\/purchase-orders\/[^/]+$/)) {
-    const store = readPurchaseOrders();
+    const store = await readPurchaseOrders();
     const orderId = decodeURIComponent(url.pathname.split("/").pop());
     store.orders = store.orders.filter(order => order.id !== orderId);
     store.settings.nextPoNo = nextPurchaseNoFromOrders(store.orders);
-    writePurchaseOrders(store);
+    await writePurchaseOrders(store);
     return send(res, 200, purchaseOrderView(store));
   }
 
   if (req.method === "POST" && url.pathname === "/api/purchase-orders/pdf") {
     const payload = await readJson(req);
-    const order = normalizePurchaseOrder(payload.order || payload, readPurchaseOrders(), false);
+    const order = normalizePurchaseOrder(payload.order || payload, await readPurchaseOrders(), false);
     if (order.status !== "Created" || !order.poNo) return send(res, 400, { error: "Create the Purchase Order before downloading PDF." });
     const pdf = purchaseOrderPdfBuffer(order);
     res.writeHead(200, {
@@ -1119,7 +1238,7 @@ async function handleApi(req, res) {
   }
 
     if (req.method === "POST" && url.pathname === "/api/inventory/models") {
-    const inventory = readInventory();
+    const inventory = await readInventory();
     const body = await readJson(req);
     const modelNo = cleanCell(body.modelNo || body.model || "").toUpperCase();
     if (!modelNo) return send(res, 400, { error: "Model No. is required" });
@@ -1143,24 +1262,24 @@ async function handleApi(req, res) {
         });
       }
     }
-    writeInventory(inventory);
-    return send(res, 200, inventoryView(inventory));
+    await writeInventory(inventory);
+    return send(res, 200, await inventoryView(inventory));
   }
 
   if (req.method === "DELETE" && url.pathname.match(/^\/api\/inventory\/models\/[^/]+$/)) {
-    const inventory = readInventory();
+    const inventory = await readInventory();
     const modelNo = decodeURIComponent(url.pathname.split("/").pop());
     inventory.models = (inventory.models || []).filter(model => inventoryNorm(model.modelNo) !== inventoryNorm(modelNo));
     inventory.supplierDns = (inventory.supplierDns || []).filter(dn => {
       if (!dn.isManualAdjustment) return true;
       return !(dn.lines || []).some(line => inventoryNorm(line.modelNo) === inventoryNorm(modelNo));
     });
-    writeInventory(inventory);
-    return send(res, 200, inventoryView(inventory));
+    await writeInventory(inventory);
+    return send(res, 200, await inventoryView(inventory));
   }
 
   if (req.method === "POST" && url.pathname === "/api/inventory/customers") {
-    const inventory = readInventory();
+    const inventory = await readInventory();
     const body = await readJson(req);
     if (!body.customerName) return send(res, 400, { error: "Customer name is required" });
     const existing = inventory.customers.find(customer => customer.id === body.id || inventoryNorm(customer.customerName) === inventoryNorm(body.customerName));
@@ -1175,31 +1294,31 @@ async function handleApi(req, res) {
     };
     if (existing) Object.assign(existing, customer);
     else inventory.customers.push(customer);
-    writeInventory(inventory);
-    syncInventoryCustomerToSales(customer);
-    return send(res, 200, inventoryView(inventory));
+    await writeInventory(inventory);
+    await syncInventoryCustomerToSales(customer);
+    return send(res, 200, await inventoryView(inventory));
   }
 
   if (req.method === "DELETE" && url.pathname.match(/^\/api\/inventory\/customers\/[^/]+$/)) {
-    const inventory = readInventory();
+    const inventory = await readInventory();
     const customerId = decodeURIComponent(url.pathname.split("/").pop());
     const deletedCustomer = (inventory.customers || []).find(customer => customer.id === customerId);
     inventory.customers = (inventory.customers || []).filter(customer => customer.id !== customerId);
-    writeInventory(inventory);
+    await writeInventory(inventory);
     if (deletedCustomer) {
-      const store = readSalesCrm();
+      const store = await readSalesCrm();
       store.customers = (store.customers || []).filter(customer => inventoryNorm(customer.name) !== inventoryNorm(deletedCustomer.customerName));
-      writeSalesCrm(store);
+      await writeSalesCrm(store);
     } else {
-      const store = readSalesCrm();
+      const store = await readSalesCrm();
       store.customers = (store.customers || []).filter(customer => customer.id !== customerId);
-      writeSalesCrm(store);
+      await writeSalesCrm(store);
     }
-    return send(res, 200, inventoryView(inventory));
+    return send(res, 200, await inventoryView(inventory));
   }
 
   if (req.method === "POST" && url.pathname === "/api/inventory/supplier-dns") {
-    const inventory = readInventory();
+    const inventory = await readInventory();
     const body = await readJson(req);
     const supplierDn = {
       id: body.id || id(),
@@ -1215,21 +1334,19 @@ async function handleApi(req, res) {
     const existingIndex = inventory.supplierDns.findIndex(dn => dn.id === supplierDn.id);
     if (existingIndex >= 0) inventory.supplierDns[existingIndex] = supplierDn;
     else inventory.supplierDns.unshift(supplierDn);
-    writeInventory(inventory);
-    return send(res, 200, inventoryView(inventory));
+    await writeInventory(inventory);
+    return send(res, 200, await inventoryView(inventory));
   }
 
   if (req.method === "POST" && url.pathname === "/api/inventory/supplier-dns/upload") {
-    const inventory = readInventory();
+    const inventory = await readInventory();
     const buffer = await collect(req);
     const multipart = parseMultipart(buffer, req.headers["content-type"] || "");
     const filePart = multipart.find(part => part.filename);
     if (!filePart) return send(res, 400, { error: "No file uploaded" });
     const uploadId = id();
-    const dir = path.join(UPLOADS, "inventory");
-    fs.mkdirSync(dir, { recursive: true });
     const storedName = `${uploadId}-${safeName(filePart.filename)}`;
-    fs.writeFileSync(path.join(dir, storedName), filePart.body);
+    await saveUpload("inventory", storedName, filePart.body, filePart.mimeType);
     const extracted = await extractSupplierDnWithOpenAI(filePart, uploadId).catch(error => ({ supplierDnNo: "", projectName: "", lines: [], message: error.message }));
     const supplierDn = {
       id: id(),
@@ -1245,12 +1362,12 @@ async function handleApi(req, res) {
     supplierDn.duplicateWarning = !!supplierDn.supplierDnNo && inventory.supplierDns.some(dn => dn.supplierDnNo && inventoryNorm(dn.supplierDnNo) === inventoryNorm(supplierDn.supplierDnNo));
     inventory.uploads.push({ id: uploadId, originalName: filePart.filename, storedName, mimeType: filePart.mimeType, size: filePart.body.length, createdAt: new Date().toISOString() });
     inventory.supplierDns.unshift(supplierDn);
-    writeInventory(inventory);
-    return send(res, 200, { ...inventoryView(inventory), activeSupplierDnId: supplierDn.id });
+    await writeInventory(inventory);
+    return send(res, 200, { ...(await inventoryView(inventory)), activeSupplierDnId: supplierDn.id });
   }
 
   if (req.method === "POST" && url.pathname.match(/^\/api\/inventory\/supplier-dns\/[^/]+\/confirm$/)) {
-    const inventory = readInventory();
+    const inventory = await readInventory();
     const supplierDnId = url.pathname.split("/")[4];
     const supplierDn = inventory.supplierDns.find(dn => dn.id === supplierDnId);
     if (!supplierDn) return notFound(res);
@@ -1260,30 +1377,30 @@ async function handleApi(req, res) {
       }
     }
     supplierDn.status = "Confirmed";
-    writeInventory(inventory);
-    return send(res, 200, inventoryView(inventory));
+    await writeInventory(inventory);
+    return send(res, 200, await inventoryView(inventory));
   }
 
   if (req.method === "POST" && url.pathname.match(/^\/api\/inventory\/supplier-dns\/[^/]+\/cancel$/)) {
-    const inventory = readInventory();
+    const inventory = await readInventory();
     const supplierDnId = url.pathname.split("/")[4];
     const supplierDn = inventory.supplierDns.find(dn => dn.id === supplierDnId);
     if (!supplierDn) return notFound(res);
     supplierDn.status = "Cancelled";
-    writeInventory(inventory);
-    return send(res, 200, inventoryView(inventory));
+    await writeInventory(inventory);
+    return send(res, 200, await inventoryView(inventory));
   }
 
   if (req.method === "DELETE" && url.pathname.match(/^\/api\/inventory\/supplier-dns\/[^/]+$/)) {
-    const inventory = readInventory();
+    const inventory = await readInventory();
     const supplierDnId = url.pathname.split("/").pop();
     inventory.supplierDns = (inventory.supplierDns || []).filter(dn => dn.id !== supplierDnId);
-    writeInventory(inventory);
-    return send(res, 200, inventoryView(inventory));
+    await writeInventory(inventory);
+    return send(res, 200, await inventoryView(inventory));
   }
 
   if (req.method === "POST" && url.pathname === "/api/inventory/delivery-notes") {
-    const inventory = readInventory();
+    const inventory = await readInventory();
     const body = await readJson(req);
     const deliveryNote = normalizeDeliveryNote(body, inventory);
     const existingIndex = inventory.deliveryNotes.findIndex(dn => dn.id === deliveryNote.id);
@@ -1300,26 +1417,26 @@ async function handleApi(req, res) {
     if (existingIndex >= 0) inventory.deliveryNotes[existingIndex] = deliveryNote;
     else inventory.deliveryNotes.unshift(deliveryNote);
     inventory.settings.nextDeliveryNo = nextDeliveryNoFrom(deliveryNote.dnNo || inventory.settings.nextDeliveryNo);
-    writeInventory(inventory);
-    return send(res, 200, inventoryView(inventory));
+    await writeInventory(inventory);
+    return send(res, 200, await inventoryView(inventory));
   }
 
   if (req.method === "POST" && url.pathname.match(/^\/api\/inventory\/delivery-notes\/[^/]+\/cancel$/)) {
-    const inventory = readInventory();
+    const inventory = await readInventory();
     const deliveryNoteId = url.pathname.split("/")[4];
     const dn = inventory.deliveryNotes.find(item => item.id === deliveryNoteId);
     if (!dn) return notFound(res);
     dn.status = "Cancelled";
-    writeInventory(inventory);
-    return send(res, 200, inventoryView(inventory));
+    await writeInventory(inventory);
+    return send(res, 200, await inventoryView(inventory));
   }
 
   if (req.method === "DELETE" && url.pathname.match(/^\/api\/inventory\/delivery-notes\/[^/]+$/)) {
-    const inventory = readInventory();
+    const inventory = await readInventory();
     const deliveryNoteId = url.pathname.split("/").pop();
     inventory.deliveryNotes = (inventory.deliveryNotes || []).filter(item => item.id !== deliveryNoteId);
-    writeInventory(inventory);
-    return send(res, 200, inventoryView(inventory));
+    await writeInventory(inventory);
+    return send(res, 200, await inventoryView(inventory));
   }
 
   if (req.method === "POST" && url.pathname === "/api/inventory/delivery-note-pdf") {
@@ -1335,13 +1452,13 @@ async function handleApi(req, res) {
 
   if (parts[0] === "api" && parts[1] === "projects" && parts[2]) {
     const projectId = parts[2];
-    const project = readProject(projectId);
+    const project = await readProject(projectId);
 
     if (req.method === "PUT" && parts.length === 3) {
       const next = await readJson(req);
       next.id = projectId;
       next.createdAt = project?.createdAt || next.createdAt || new Date().toISOString();
-      writeProject(next);
+      await writeProject(next);
       return send(res, 200, next);
     }
 
@@ -1350,8 +1467,7 @@ async function handleApi(req, res) {
     if (req.method === "GET" && parts.length === 3) return send(res, 200, project);
 
     if (req.method === "DELETE" && parts.length === 3) {
-      const file = projectPath(projectId);
-      if (fs.existsSync(file)) fs.unlinkSync(file);
+      await deleteProject(projectId);
       return send(res, 200, { ok: true });
     }
 
@@ -1364,9 +1480,7 @@ async function handleApi(req, res) {
       const uploadId = id();
       const nodeId = nodePart ? nodePart.body.toString("utf8") : "file";
       const storedName = `${uploadId}-${safeName(filePart.filename)}`;
-      const dir = path.join(UPLOADS, projectId);
-      fs.mkdirSync(dir, { recursive: true });
-      fs.writeFileSync(path.join(dir, storedName), filePart.body);
+      await saveUpload(`projects/${projectId}`, storedName, filePart.body, filePart.mimeType);
       const upload = {
         id: uploadId,
         projectId,
@@ -1381,20 +1495,14 @@ async function handleApi(req, res) {
       const node = project.nodes.find(n => n.id === nodeId);
       if (node) node.data.uploadId = uploadId;
       if (nodeId === "thermal-upload" || nodeId === "vrv-upload") project.visible = true;
-      writeProject(project);
+      await writeProject(project);
       return send(res, 201, upload);
     }
 
     if (req.method === "GET" && parts[3] === "uploads" && parts[4]) {
       const upload = project.uploads.find(item => item.id === parts[4]);
       if (!upload) return notFound(res);
-      const file = path.join(UPLOADS, projectId, upload.storedName);
-      if (!fs.existsSync(file)) return notFound(res);
-      res.writeHead(200, {
-        "Content-Type": upload.mimeType || "application/octet-stream",
-        "Content-Disposition": `inline; filename="${upload.originalName.replace(/"/g, "")}"`
-      });
-      return fs.createReadStream(file).pipe(res);
+      return sendStoredUpload(res, upload, `projects/${projectId}`);
     }
 
     if (req.method === "POST" && parts[3] === "extract" && parts[4] === "thermal") {
@@ -1415,7 +1523,7 @@ async function handleApi(req, res) {
       const result = await extractThermalWithOpenAI(project, body);
       if (!body.previewOnly && result.rows && result.rows.length) {
         project.tables.thermal.rows = result.rows;
-        writeProject(project);
+        await writeProject(project);
       }
       return send(res, 200, result);
     }
@@ -1424,8 +1532,9 @@ async function handleApi(req, res) {
       const body = await readJson(req);
       const upload = project.uploads.find(item => item.id === body.uploadId);
       if (!upload) return send(res, 400, { error: "VRV file not found" });
-      const file = path.join(UPLOADS, projectId, upload.storedName);
-      const extracted = extractVrvFile(file, upload.originalName);
+      const bytes = await readUpload(`projects/${projectId}`, upload.storedName);
+      if (!bytes) return send(res, 400, { error: "VRV file not found" });
+      const extracted = extractVrvFile(bytes, upload.originalName);
       return send(res, 200, extracted);
     }
   }
@@ -1487,9 +1596,8 @@ async function extractThermalWithOpenAI(project, options) {
   ];
 
   for (const upload of uploads) {
-    const file = path.join(UPLOADS, project.id, upload.storedName);
-    if (!fs.existsSync(file)) continue;
-    const bytes = fs.readFileSync(file);
+    const bytes = await readUpload(`projects/${project.id}`, upload.storedName);
+    if (!bytes) continue;
     const base64 = bytes.toString("base64");
     const mime = upload.mimeType || mimeTypes[path.extname(upload.originalName).toLowerCase()] || "application/octet-stream";
     if (mime.includes("pdf")) {
@@ -1968,13 +2076,13 @@ function computeInventory(inventory) {
   return { lots, stockByModel, movements };
 }
 
-function inventoryView(inventory) {
+async function inventoryView(inventory) {
   ensureManualStockNumbers(inventory);
   const computed = computeInventory(inventory);
   const stock = Object.values(computed.stockByModel).sort((a, b) => a.modelNo.localeCompare(b.modelNo));
   const lowStock = stock.filter(item => item.minimumStock && item.qty < item.minimumStock);
   const pendingReview = (inventory.supplierDns || []).filter(dn => dn.status === "Review Needed").length;
-  const salesStore = readSalesCrm();
+  const salesStore = await readSalesCrm();
   return {
     settings: inventory.settings,
     models: inventory.models,
@@ -2297,7 +2405,7 @@ function extractVrvFile(file, originalName) {
       message: "Automatic VRV extraction is available for DOCX in this MVP. PDF/image parsing needs OCR."
     };
   }
-  const entries = unzipEntries(fs.readFileSync(file));
+  const entries = unzipEntries(Buffer.isBuffer(file) ? file : fs.readFileSync(file));
   const documentXml = entries["word/document.xml"];
   if (!documentXml) return { status: "error", materialRows: [], vrvRows: [], projectName: "", message: "Could not read DOCX document.xml" };
   const text = xmlText(documentXml);
