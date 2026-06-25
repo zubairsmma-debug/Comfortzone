@@ -1,0 +1,7 @@
+tmp/
+.agents/
+data/uploads/
+scripts/__pycache__/
+*.pyc
+.env
+node_modules/
