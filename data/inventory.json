@@ -1,0 +1,73 @@
+{
+  "settings": {
+    "nextDeliveryNo": "DN-2063"
+  },
+  "models": [],
+  "customers": [
+    {
+      "id": "4e00b1ce-a17a-465d-bccf-88fd6d087a54",
+      "customerName": "Elite Villas Management",
+      "contactPerson": "Fatima Al Sayed",
+      "phone": "+971 4 888 2345",
+      "email": "fatima@elitevillas.ae",
+      "address": "Jumeirah 1, Dubai",
+      "defaultDeliveryLocation": "Villa AC Replacement - Jumeirah"
+    },
+    {
+      "id": "b904372b-df4b-4f73-a23c-5ec4f44f7f31",
+      "customerName": "ABCD Engineering Consultant",
+      "contactPerson": "Mr. ABDC",
+      "phone": "98765432222d",
+      "email": "dcba@gmail.com",
+      "address": "",
+      "defaultDeliveryLocation": "Muweilah, Sharjah"
+    },
+    {
+      "id": "cbac0873-a407-4ec9-80eb-f298c06544b4",
+      "customerName": "XYZ company",
+      "contactPerson": "Person",
+      "phone": "332331333221",
+      "email": "ss@gmail.com",
+      "address": "RAK",
+      "defaultDeliveryLocation": ""
+    },
+    {
+      "id": "7cbdd6dd-8678-494d-9c97-e0f0718f167f",
+      "customerName": "ddc",
+      "contactPerson": "ddc",
+      "phone": "",
+      "email": "",
+      "address": "",
+      "defaultDeliveryLocation": ""
+    },
+    {
+      "id": "58dadb82-11c1-41a4-9972-bb48c47e7ea1",
+      "customerName": "Kompany",
+      "contactPerson": "Kompany",
+      "phone": "97913245793",
+      "email": "",
+      "address": "Al Ain",
+      "defaultDeliveryLocation": "AC Units"
+    }
+  ],
+  "supplierDns": [],
+  "deliveryNotes": [],
+  "uploads": [
+    {
+      "id": "3dde0d33-297f-4795-8dd1-e08b645b52b4",
+      "originalName": "WhatsApp Image 2026-06-17 at 15.41.27.jpeg",
+      "storedName": "3dde0d33-297f-4795-8dd1-e08b645b52b4-WhatsApp Image 2026-06-17 at 15.41.27.jpeg",
+      "mimeType": "image/jpeg",
+      "size": 56228,
+      "createdAt": "2026-06-17T11:41:46.993Z"
+    },
+    {
+      "id": "d8964f6b-37d2-4fe4-a792-f7e441648692",
+      "originalName": "Sinopec Electromechanical LLC.pdf",
+      "storedName": "d8964f6b-37d2-4fe4-a792-f7e441648692-Sinopec Electromechanical LLC.pdf",
+      "mimeType": "application/pdf",
+      "size": 2897487,
+      "createdAt": "2026-06-17T11:42:12.644Z"
+    }
+  ]
+}

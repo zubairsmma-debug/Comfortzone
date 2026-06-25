@@ -1,0 +1,41 @@
+{
+  "company": {
+    "name": "Comfort Zone AC Devices Tr. LLC",
+    "address": "Showroom 1, Industrial Area 18, Sharjah",
+    "trn": "",
+    "phone": "0561772530",
+    "email": "info@comfortzoneuae.com",
+    "website": "www.comfortzoneuae.com",
+    "logoUploadId": "49002d1e-311d-46cf-8f8d-b8e46a9e6057"
+  },
+  "company2": {
+    "name": "Al Mahira Technical Services",
+    "address": "",
+    "trn": "",
+    "phone": "",
+    "email": "",
+    "website": "",
+    "logoUploadId": ""
+  },
+  "users": [
+    {
+      "id": "admin",
+      "name": "Admin User",
+      "role": "Admin",
+      "email": "admin@comfortzone.local",
+      "passwordHash": "637670de0159b7fe338dc8e181c820b3:4e47969c2131c521c34a1f4387b9b53b105885233131adb140924983d97d7b73",
+      "active": true
+    }
+  ],
+  "attachments": [
+    {
+      "id": "49002d1e-311d-46cf-8f8d-b8e46a9e6057",
+      "originalName": "Comfot zone Logo.jpeg",
+      "storedName": "49002d1e-311d-46cf-8f8d-b8e46a9e6057-Comfot zone Logo.jpeg",
+      "mimeType": "image/jpeg",
+      "size": 32005,
+      "category": "Logo",
+      "createdAt": "2026-06-23T09:25:15.579Z"
+    }
+  ]
+}

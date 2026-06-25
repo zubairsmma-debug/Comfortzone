@@ -1,0 +1,510 @@
+{
+  "settings": {
+    "nextQuotationNo": "CZ-QTN-2026-0001-R5",
+    "nextEnquiryNo": "EN-26-1002"
+  },
+  "leads": [
+    {
+      "id": "4caa4352-68fd-4228-8fc5-ffa10c8052ef",
+      "enquiryNo": "EN-26-1001",
+      "avatar": "KO",
+      "customer": "Kompany",
+      "phone": "97913245793",
+      "requirement": "AC Units",
+      "projectType": "Villa Project",
+      "location": "Al Ain",
+      "source": "Referral",
+      "status": "Contacted",
+      "followUp": "24/06/2026",
+      "priority": "Overdue"
+    },
+    {
+      "id": "3ca98ee0-6367-4070-a278-1b43a4181b95",
+      "enquiryNo": "EN-26",
+      "avatar": "DD",
+      "customer": "ddc",
+      "phone": "",
+      "requirement": "",
+      "projectType": "Villa Project",
+      "location": "",
+      "source": "WhatsApp",
+      "status": "New Lead",
+      "followUp": "",
+      "priority": "Planned"
+    },
+    {
+      "id": "10f81779-49c0-4ddd-9b4c-a24e8b292e03",
+      "enquiryNo": "EN-26",
+      "avatar": "AE",
+      "customer": "ABC Engineering co Private limited company",
+      "phone": "9876543210",
+      "requirement": "AC UNITS",
+      "projectType": "Maintenance",
+      "location": "Sharjah",
+      "source": "WhatsApp",
+      "status": "Contacted",
+      "followUp": "fadfv",
+      "priority": "Today"
+    },
+    {
+      "id": "f8f10ab2-6732-4d1e-857c-a151e9cbac51",
+      "avatar": "SL",
+      "customer": "Skyline Logistics",
+      "phone": "+971 4 445 2190",
+      "requirement": "Warehouse VRV Replacement",
+      "projectType": "Commercial",
+      "location": "Dubai Investment Park",
+      "source": "Website",
+      "status": "Contacted",
+      "followUp": "24 Jun 2026",
+      "priority": "Today"
+    },
+    {
+      "id": "e4eaae52-5c32-4254-affc-27f3bffb82cd",
+      "avatar": "PN",
+      "customer": "Priya Nair",
+      "phone": "+971 55 901 2234",
+      "requirement": "Apartment ducted AC service",
+      "projectType": "Apartment",
+      "location": "JLT, Dubai",
+      "source": "Referral",
+      "status": "Site Visit",
+      "followUp": "25 Jun 2026",
+      "priority": "Planned"
+    },
+    {
+      "id": "a1ec8bae-1c3d-4c8c-9cae-350d03148983",
+      "avatar": "TN",
+      "customer": "TechNova Solutions",
+      "phone": "+971 4 777 1020",
+      "requirement": "Office maintenance contract",
+      "projectType": "Commercial",
+      "location": "Business Bay, Dubai",
+      "source": "Website",
+      "status": "Quotation Needed",
+      "followUp": "26 Jun 2026",
+      "priority": "Planned"
+    }
+  ],
+  "customers": [
+    {
+      "id": "58dadb82-11c1-41a4-9972-bb48c47e7ea1",
+      "icon": "KO",
+      "name": "Kompany",
+      "type": "Villa Project",
+      "contact": "Kompany",
+      "role": "",
+      "phone": "97913245793",
+      "email": "",
+      "address": "Al Ain",
+      "detail": "AC Units",
+      "trn": ""
+    },
+    {
+      "id": "7cbdd6dd-8678-494d-9c97-e0f0718f167f",
+      "icon": "DD",
+      "name": "ddc",
+      "type": "Villa Project",
+      "contact": "ddc",
+      "role": "",
+      "phone": "",
+      "email": "",
+      "address": "",
+      "detail": "",
+      "trn": ""
+    },
+    {
+      "id": "cbac0873-a407-4ec9-80eb-f298c06544b4",
+      "icon": "XC",
+      "name": "XYZ company",
+      "type": "Commercial",
+      "contact": "Person",
+      "role": "",
+      "phone": "332331333221",
+      "email": "ss@gmail.com",
+      "address": "RAK",
+      "detail": "RAK",
+      "trn": ""
+    },
+    {
+      "id": "7d8f41ed-8285-4bf5-a24a-e2e4a7f36af7",
+      "icon": "EV",
+      "name": "Elite Villas Management",
+      "type": "Commercial",
+      "contact": "Fatima Al Sayed",
+      "role": "",
+      "phone": "+971 4 888 2345",
+      "email": "fatima@elitevillas.ae",
+      "address": "Jumeirah 1, Dubai",
+      "detail": "Villa AC Replacement - Jumeirah",
+      "trn": ""
+    },
+    {
+      "id": "b904372b-df4b-4f73-a23c-5ec4f44f7f31",
+      "icon": "AE",
+      "name": "ABCD Engineering Consultant",
+      "type": "Residential",
+      "contact": "Mr. ABDC",
+      "role": "",
+      "phone": "98765432222d",
+      "email": "dcba@gmail.com",
+      "address": "",
+      "detail": "Muweilah, Sharjah",
+      "trn": ""
+    },
+    {
+      "id": "5cb80dd4-deb4-4ca8-b0c6-8423f2baa541",
+      "icon": "TN",
+      "name": "TechNova Solutions",
+      "type": "Commercial",
+      "contact": "Priya Nair",
+      "role": "Admin Manager",
+      "phone": "+971 55 612 9911",
+      "email": "admin@technova.ae",
+      "address": "JLT, Dubai",
+      "detail": "Cluster X",
+      "trn": "100675430000003"
+    }
+  ],
+  "projects": [
+    {
+      "id": "cdfb5dbb-e2ea-4b09-94da-017b6a93252c",
+      "name": "Villa AC Replacement - Jumeirah",
+      "customer": "ABC Contracting",
+      "location": "Jumeirah 1, Dubai",
+      "type": "Residential",
+      "requirement": "Supply & Installation",
+      "engineer": "Sarah Johnson",
+      "status": "Lost",
+      "date": "12 Oct 2026",
+      "value": "AED 128,500"
+    },
+    {
+      "id": "239ff066-404d-4e81-a896-e4cf6e31c799",
+      "name": "Retail Mall Ducting Service",
+      "customer": "Majid Al Futtaim",
+      "location": "Mirdif, Dubai",
+      "type": "Commercial",
+      "requirement": "Repair / Service",
+      "engineer": "Michael Chen",
+      "status": "Quotation Sent",
+      "date": "14 Oct 2026",
+      "value": "AED 42,600"
+    },
+    {
+      "id": "5ec041ec-a9c5-4802-81d8-b2d9e1c451e1",
+      "name": "Office VRV Maintenance",
+      "customer": "TechNova Solutions",
+      "location": "JLT, Dubai",
+      "type": "Commercial",
+      "requirement": "AMC / Maintenance",
+      "engineer": "Arjun Singh",
+      "status": "Negotiation",
+      "date": "16 Oct 2026",
+      "value": "AED 88,900"
+    }
+  ],
+  "quotations": [
+    {
+      "id": "bd733117-61a6-4d98-a2f3-69ead23e379b",
+      "no": "CZ-QTN-2026-0001-R5",
+      "revision": "Fresh Quote",
+      "date": "23-06-2026",
+      "validity": "7 Days",
+      "salesperson": "",
+      "customer": "Elite Villas Management",
+      "project": "Villa AC Replacement - Jumeirah",
+      "location": "",
+      "paymentTerms": "30 Days Credit",
+      "deliveryTime": "To be discussed",
+      "warranty": "",
+      "quoteType": "FAHU",
+      "notes": "Notes for FAHU:\n1. All major specifications as per Daikin Standards.\n2. Access doors are provided as per Daikin Standards.\n3. Light & port hole shall be provided for filter and fan section.\n4. Differential pressure switch 50-500 Pa shall be provided for each filter section\n5. Drive screen shall be provided for all Fan section\n\nExclusions for FAHU:\n1. Sound attenuators or silencers, sand trap louvers, insect screen, damper actuators, Motorized dampers.\n2. We have not considered any control valves, thermostats or any kind of DDC or electric control, starters.\n3. Any item which is not mentioned specifically in our offer.\n4. We are not considering any spares for the units.\n5. Unloading, installation, storage and maintenance of equipment's at site.\n6. Starter panel and disconnect switch for AHU's.\n7. VFD's for fan motors.\n8. Special Warranty if any\n9. Testing of AHU's\n10. Assembly of modular sections of AHUs at site.\n11. Modulating control valve installed on return CHW pipe.\n12. External Vibration Isolators.\n13. BMS connectivity.\n14. Performance testing.\n15. Thyristor Modulating controls/Controls for heaters if any\n16. Starter & DDC control panel for AHUs.\n17. EC Motor for AHU/FAHU\n18. Spare filters/belts/bearings/Motors for AHU/FAHU\n\nExclusions for VRV ODU for FAHU:\n1. Home Automation system interface\n2. Central controller\n3. Installation of any systems quoted\n4. Copper pipes, insulation, Electrical wires and accessories\n5. Refrigerant gas, supply & topping up.\n6. Anything that is not mentioned in the BOQ above.",
+      "terms": "Warranty:\nUnits offered are covered under a standard warranty of 12 months from the date of purchase for the whole units and an additional 48 months on compressor against manufacturing defects. Warranty covers the replacement of defective parts and does not include labor charges. Defects caused due to improper installation will void the warranty.\n\nExclusions:\nInstallation of AC units, unloading of units at site & supply of items other than mentioned.",
+      "items": [
+        {
+          "id": "81e0aa59-900b-498f-a410-773571c6d52c",
+          "description": "RXYTQ16U5YF - DAIKIN VRV OUTDOOR UNIT - TURKEY",
+          "qty": 2,
+          "unit": "Nos",
+          "unitPrice": 0
+        },
+        {
+          "id": "1b848c55-ef5a-4ff5-a03a-6722fc003092",
+          "description": "RXYTQ8U5YF - DAIKIN VRV OUTDOOR UNIT - TURKEY",
+          "qty": 1,
+          "unit": "Nos",
+          "unitPrice": 0
+        },
+        {
+          "id": "2b94e4d2-ce45-4786-982f-ac35b8b2fbde",
+          "description": "RXYTQ14U5YF - DAIKIN VRV OUTDOOR UNIT - TURKEY",
+          "qty": 1,
+          "unit": "Nos",
+          "unitPrice": 0
+        },
+        {
+          "id": "aae5771b-1fe8-40ae-ade4-2365752aa203",
+          "description": "RXYTQ12U5YF - DAIKIN VRV OUTDOOR UNIT - TURKEY",
+          "qty": 3,
+          "unit": "Nos",
+          "unitPrice": 0
+        },
+        {
+          "id": "99ac5b8b-2e3e-47df-8c33-e046944658c1",
+          "description": "FXSQ25A - DAIKIN VRV INDOOR UNIT- Ducted (medium static) - CZECH REPUBLIC",
+          "qty": 9,
+          "unit": "Nos",
+          "unitPrice": 0
+        },
+        {
+          "id": "dc8d20bd-aacb-48ed-89fb-af8a73031d9f",
+          "description": "FXSQ32A - DAIKIN VRV INDOOR UNIT- Ducted (medium static) - CZECH REPUBLIC",
+          "qty": 1,
+          "unit": "Nos",
+          "unitPrice": 0
+        },
+        {
+          "id": "506df190-d42c-48d6-be1b-99e0969ad65d",
+          "description": "FXSQ63A - DAIKIN VRV INDOOR UNIT- Ducted (medium static) - CZECH REPUBLIC",
+          "qty": 5,
+          "unit": "Nos",
+          "unitPrice": 0
+        },
+        {
+          "id": "0cc1424a-18b6-4e43-b2e3-4d51604c1e08",
+          "description": "FXSQ80A - DAIKIN VRV INDOOR UNIT- Ducted (medium static) - CZECH REPUBLIC",
+          "qty": 5,
+          "unit": "Nos",
+          "unitPrice": 0
+        },
+        {
+          "id": "e9a50329-b6b0-472f-a511-5013906b9235",
+          "description": "FXSQ100A - DAIKIN VRV INDOOR UNIT- Ducted (medium static) - CZECH REPUBLIC",
+          "qty": 11,
+          "unit": "Nos",
+          "unitPrice": 0
+        },
+        {
+          "id": "1d3dc97d-e97a-482c-9069-1dd34f992e57",
+          "description": "KHRQ22M20T - DAIKIN REFNETS - IDU - BELGIUM",
+          "qty": 3,
+          "unit": "Nos",
+          "unitPrice": 0
+        },
+        {
+          "id": "dae1fb40-48d9-4887-8e5d-05f162ecc89d",
+          "description": "KHRQ22M29T9 - DAIKIN REFNETS - IDU - BELGIUM",
+          "qty": 6,
+          "unit": "Nos",
+          "unitPrice": 0
+        },
+        {
+          "id": "76249935-a151-458c-9414-24363ee1212f",
+          "description": "KHRQ22M64T - DAIKIN REFNETS - IDU - BELGIUM",
+          "qty": 14,
+          "unit": "Nos",
+          "unitPrice": 0
+        },
+        {
+          "id": "50544f80-59d4-4764-b8d3-42e211a8ca99",
+          "description": "KHRQ22M75T - DAIKIN REFNETS - IDU - BELGIUM",
+          "qty": 5,
+          "unit": "Nos",
+          "unitPrice": 0
+        },
+        {
+          "id": "fd7f536b-395c-4f46-8a71-afddb8b0f3e9",
+          "description": "BHFQ22P1007 - DAIKIN REFNETS - ODU - BELGIUM",
+          "qty": 2,
+          "unit": "Nos",
+          "unitPrice": 0
+        },
+        {
+          "id": "13e0615a-6f33-4582-846c-25351fb6525f",
+          "description": "BHFQ22P1517 - DAIKIN REFNETS - ODU - BELGIUM",
+          "qty": 1,
+          "unit": "Nos",
+          "unitPrice": 0
+        },
+        {
+          "id": "acc7d468-1402-45ed-bd5a-3c7304f47ece",
+          "description": "BRC1H82W7",
+          "qty": 31,
+          "unit": "Nos",
+          "unitPrice": 0
+        }
+      ],
+      "manualSubtotal": "300000",
+      "discount": 0,
+      "status": "Draft",
+      "amount": 315000
+    },
+    {
+      "id": "a7692cdd-768d-4153-94c1-3cde0f5b1f48",
+      "no": "CZ-QTN-2026-0001-R4",
+      "revision": "Fresh Quote",
+      "date": "21-06-2026",
+      "validity": "7 Days",
+      "salesperson": "",
+      "customer": "Elite Villas Management",
+      "project": "Villa AC Replacement - Jumeirah",
+      "location": "",
+      "paymentTerms": "30 Days Credit",
+      "deliveryTime": "To be discussed",
+      "warranty": "",
+      "quoteType": "FAHU",
+      "notes": "Notes for FAHU:\n1. All major specifications as per Daikin Standards.\n2. Access doors are provided as per Daikin Standards.\n3. Light & port hole shall be provided for filter and fan section.\n4. Differential pressure switch 50-500 Pa shall be provided for each filter section\n5. Drive screen shall be provided for all Fan section\n\nExclusions for FAHU:\n1. Sound attenuators or silencers, sand trap louvers, insect screen, damper actuators, Motorized dampers.\n2. We have not considered any control valves, thermostats or any kind of DDC or electric control, starters.\n3. Any item which is not mentioned specifically in our offer.\n4. We are not considering any spares for the units.\n5. Unloading, installation, storage and maintenance of equipment's at site.\n6. Starter panel and disconnect switch for AHU's.\n7. VFD's for fan motors.\n8. Special Warranty if any\n9. Testing of AHU's\n10. Assembly of modular sections of AHUs at site.\n11. Modulating control valve installed on return CHW pipe.\n12. External Vibration Isolators.\n13. BMS connectivity.\n14. Performance testing.\n15. Thyristor Modulating controls/Controls for heaters if any\n16. Starter & DDC control panel for AHUs.\n17. EC Motor for AHU/FAHU\n18. Spare filters/belts/bearings/Motors for AHU/FAHU\n\nExclusions for VRV ODU for FAHU:\n1. Home Automation system interface\n2. Central controller\n3. Installation of any systems quoted\n4. Copper pipes, insulation, Electrical wires and accessories\n5. Refrigerant gas, supply & topping up.\n6. Anything that is not mentioned in the BOQ above.",
+      "terms": "Warranty:\nUnits offered are covered under a standard warranty of 12 months from the date of purchase for the whole units and an additional 48 months on compressor against manufacturing defects. Warranty covers the replacement of defective parts and does not include labor charges. Defects caused due to improper installation will void the warranty.\n\nExclusions:\nInstallation of AC units, unloading of units at site & supply of items other than mentioned.",
+      "items": [
+        {
+          "id": "aa7b7529-c847-4bd2-8a3c-d6f371d3c80a",
+          "description": "rxtq",
+          "qty": 1,
+          "unit": "Nos",
+          "unitPrice": 0
+        }
+      ],
+      "manualSubtotal": "3000",
+      "discount": 0,
+      "status": "Sent",
+      "amount": 3150
+    },
+    {
+      "id": "0083f953-8add-430c-b746-7c61dbd02073",
+      "no": "CZ-QTN-2026-0001-R3",
+      "revision": "Fresh Quote",
+      "date": "22-06-2026",
+      "validity": "7 Days",
+      "salesperson": "",
+      "customer": "ABCD Engineering Consultant",
+      "project": "Sample_VRV_Report",
+      "location": "",
+      "paymentTerms": "30 Days Credit",
+      "deliveryTime": "To be discussed",
+      "warranty": "",
+      "quoteType": "FAHU",
+      "notes": "Notes for FAHU:\n1. All major specifications as per Daikin Standards.\n2. Access doors are provided as per Daikin Standards.\n3. Light & port hole shall be provided for filter and fan section.\n4. Differential pressure switch 50-500 Pa shall be provided for each filter section\n5. Drive screen shall be provided for all Fan section\n\nExclusions for FAHU:\n1. Sound attenuators or silencers, sand trap louvers, insect screen, damper actuators, Motorized dampers.\n2. We have not considered any control valves, thermostats or any kind of DDC or electric control, starters.\n3. Any item which is not mentioned specifically in our offer.\n4. We are not considering any spares for the units.\n5. Unloading, installation, storage and maintenance of equipment's at site.\n6. Starter panel and disconnect switch for AHU's.\n7. VFD's for fan motors.\n8. Special Warranty if any\n9. Testing of AHU's\n10. Assembly of modular sections of AHUs at site.\n11. Modulating control valve installed on return CHW pipe.\n12. External Vibration Isolators.\n13. BMS connectivity.\n14. Performance testing.\n15. Thyristor Modulating controls/Controls for heaters if any\n16. Starter & DDC control panel for AHUs.\n17. EC Motor for AHU/FAHU\n18. Spare filters/belts/bearings/Motors for AHU/FAHU\n\nExclusions for VRV ODU for FAHU:\n1. Home Automation system interface\n2. Central controller\n3. Installation of any systems quoted\n4. Copper pipes, insulation, Electrical wires and accessories\n5. Refrigerant gas, supply & topping up.\n6. Anything that is not mentioned in the BOQ above.",
+      "terms": "Warranty:\nUnits offered are covered under a standard warranty of 12 months from the date of purchase for the whole units and an additional 48 months on compressor against manufacturing defects. Warranty covers the replacement of defective parts and does not include labor charges. Defects caused due to improper installation will void the warranty.\n\nExclusions:\nInstallation of AC units, unloading of units at site & supply of items other than mentioned.",
+      "items": [
+        {
+          "id": "55da8d47-7887-4c97-81fb-f4f84be1d0ce",
+          "description": "RXYTQ16U5YF - DAIKIN VRV OUTDOOR UNIT - TURKEY",
+          "qty": 2,
+          "unit": "Nos",
+          "unitPrice": 0
+        },
+        {
+          "id": "101ba0b1-fa4c-4106-bcda-f7f9bf7a329c",
+          "description": "RXYTQ8U5YF - DAIKIN VRV OUTDOOR UNIT - TURKEY",
+          "qty": 1,
+          "unit": "Nos",
+          "unitPrice": 0
+        },
+        {
+          "id": "b827a711-8ef5-448c-9ead-2132737bcfe1",
+          "description": "RXYTQ14U5YF - DAIKIN VRV OUTDOOR UNIT - TURKEY",
+          "qty": 1,
+          "unit": "Nos",
+          "unitPrice": 0
+        },
+        {
+          "id": "3de03b0d-4bb1-4921-ae4d-f53c1f232c1e",
+          "description": "RXYTQ12U5YF - DAIKIN VRV OUTDOOR UNIT - TURKEY",
+          "qty": 3,
+          "unit": "Nos",
+          "unitPrice": 0
+        },
+        {
+          "id": "d0f557ef-d1e7-45da-81b4-db9e3e15c92e",
+          "description": "FXSQ25A - DAIKIN VRV INDOOR UNIT- Ducted (medium static) - CZECH REPUBLIC",
+          "qty": 9,
+          "unit": "Nos",
+          "unitPrice": 0
+        },
+        {
+          "id": "4a947719-2175-4a12-a4ad-a88cd8858a45",
+          "description": "FXSQ32A - DAIKIN VRV INDOOR UNIT- Ducted (medium static) - CZECH REPUBLIC",
+          "qty": 1,
+          "unit": "Nos",
+          "unitPrice": 0
+        },
+        {
+          "id": "60498da4-9078-4a26-a49e-3520e0b17bf1",
+          "description": "FXSQ63A - DAIKIN VRV INDOOR UNIT- Ducted (medium static) - CZECH REPUBLIC",
+          "qty": 5,
+          "unit": "Nos",
+          "unitPrice": 0
+        },
+        {
+          "id": "aeeea397-ae81-40a8-8ba4-7017b6e3f1ac",
+          "description": "FXSQ80A - DAIKIN VRV INDOOR UNIT- Ducted (medium static) - CZECH REPUBLIC",
+          "qty": 5,
+          "unit": "Nos",
+          "unitPrice": 0
+        },
+        {
+          "id": "7c49891a-bd22-4a83-be7f-09516a776c15",
+          "description": "FXSQ100A - DAIKIN VRV INDOOR UNIT- Ducted (medium static) - CZECH REPUBLIC",
+          "qty": 11,
+          "unit": "Nos",
+          "unitPrice": 0
+        },
+        {
+          "id": "3ade2e07-10bb-4c61-b344-f675568fa3c5",
+          "description": "KHRQ22M20T - DAIKIN REFNETS - IDU - BELGIUM",
+          "qty": 3,
+          "unit": "Nos",
+          "unitPrice": 0
+        },
+        {
+          "id": "cca68655-a39a-42fb-8a69-4d7787d0f072",
+          "description": "KHRQ22M29T9 - DAIKIN REFNETS - IDU - BELGIUM",
+          "qty": 6,
+          "unit": "Nos",
+          "unitPrice": 0
+        },
+        {
+          "id": "34042b79-bb40-41ac-a3ff-48f8ac08455a",
+          "description": "KHRQ22M64T - DAIKIN REFNETS - IDU - BELGIUM",
+          "qty": 14,
+          "unit": "Nos",
+          "unitPrice": 0
+        },
+        {
+          "id": "b72bf125-639b-4c93-84d7-97114a13e29d",
+          "description": "KHRQ22M75T - DAIKIN REFNETS - IDU - BELGIUM",
+          "qty": 5,
+          "unit": "Nos",
+          "unitPrice": 0
+        },
+        {
+          "id": "ea271ae8-995f-4132-88b1-59672806547b",
+          "description": "BHFQ22P1007 - DAIKIN REFNETS - ODU - BELGIUM",
+          "qty": 2,
+          "unit": "Nos",
+          "unitPrice": 0
+        },
+        {
+          "id": "f8a873f1-2c26-4688-be43-ba461c8873cc",
+          "description": "BHFQ22P1517 - DAIKIN REFNETS - ODU - BELGIUM",
+          "qty": 1,
+          "unit": "Nos",
+          "unitPrice": 0
+        },
+        {
+          "id": "205bb5fe-94c1-4e7f-a456-2a8f8db29860",
+          "description": "BRC1H82W7",
+          "qty": 31,
+          "unit": "Nos",
+          "unitPrice": 0
+        }
+      ],
+      "manualSubtotal": "100000",
+      "discount": 0,
+      "status": "Sent",
+      "amount": 105000
+    }
+  ],
+  "followUps": []
+}

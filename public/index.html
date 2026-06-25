@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HVAC Workflow App</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">CZ</div>
+      <div>
+        <strong>Comfort Zone</strong>
+        <span>Daikin</span>
+      </div>
+    </div>
+    <button id="salesDeskBtn" class="nav-button">Sales Desk</button>
+    <div id="salesDeskSubnav" class="subnav hidden">
+      <button data-sales-view="dashboard">Dashboard</button>
+      <button data-sales-view="leads">Leads</button>
+      <button data-sales-view="customers">Customers</button>
+      <button data-sales-view="projects">Projects</button>
+      <button data-sales-view="quotation">Quotation</button>
+      <button data-sales-view="followUps">Follow Ups</button>
+    </div>
+    <button id="newProjectBtn" class="nav-button active">Workflow</button>
+    <div id="projectSubnav" class="subnav">
+      <button id="documentsBtn">My WorkFlows</button>
+    </div>
+    <button id="inventoryBtn" class="nav-button">Inventory</button>
+    <div id="inventorySubnav" class="subnav hidden">
+      <button data-inventory-view="dashboard">Dashboard</button>
+      <button data-inventory-view="supplier">Supplier DN</button>
+      <button data-inventory-view="delivery">Delivery Note</button>
+      <button data-inventory-view="stock">Stock</button>
+    </div>
+    <button id="purchaseOrdersBtn" class="nav-button">Purchase Orders</button>
+    <div class="sidebar-footer">
+      <button id="settingsBtn" class="nav-button">Settings</button>
+      <button id="logoutBtn" class="nav-button">Logout</button>
+    </div>
+  </aside>
+
+  <main class="app-shell">
+    <header class="topbar">
+      <div>
+        <h1 id="pageTitle">Workflow</h1>
+        <p id="projectMeta">Create a workflow canvas, upload files, and generate BOQ/quotation outputs.</p>
+      </div>
+      <div class="top-actions">
+        <button id="saveBtn" class="primary-button save-project-top">Save Workflow</button>
+        <button id="zoomOutBtn" class="ghost-button">-</button>
+        <button id="zoomFitBtn" class="ghost-button">Fit</button>
+        <button id="zoomInBtn" class="ghost-button">+</button>
+        <button id="addNodeBtn" class="icon-button" title="Add file node">+</button>
+      </div>
+      <div id="viewActions" class="top-actions hidden"></div>
+    </header>
+
+    <section id="documentsView" class="documents-view hidden">
+      <div class="documents-header">
+        <input id="searchInput" type="search" placeholder="Search by project, customer, quotation no., enquiry no.">
+      </div>
+      <div id="projectList" class="project-list"></div>
+    </section>
+
+    <section id="inventoryView" class="inventory-view hidden">
+      <div id="inventoryRoot"></div>
+    </section>
+
+    <section id="purchaseOrdersView" class="purchase-orders-view hidden">
+      <div id="purchaseOrdersRoot"></div>
+    </section>
+
+    <section id="salesDeskView" class="inventory-view hidden">
+      <div id="salesDeskRoot"></div>
+    </section>
+
+    <section id="settingsView" class="inventory-view hidden">
+      <div id="settingsRoot"></div>
+    </section>
+
+    <section id="canvasView" class="canvas-wrap">
+      <div id="canvas" class="canvas"></div>
+    </section>
+  </main>
+
+  <section id="loginView" class="login-view hidden">
+    <form id="loginForm" class="login-card">
+      <div class="brand login-brand">
+        <div class="brand-mark">CZ</div>
+        <div>
+          <strong>Comfort Zone</strong>
+          <span>Daikin</span>
+        </div>
+      </div>
+      <h1>Login</h1>
+      <p>Use your admin or employee login to continue.</p>
+      <label>Email<input id="loginEmail" type="email" autocomplete="username" required></label>
+      <label>Password<input id="loginPassword" type="password" autocomplete="current-password" required></label>
+      <button class="primary-button" type="submit">Login</button>
+      <p id="loginMessage" class="login-message"></p>
+    </form>
+  </section>
+
+  <section id="chatPanel" class="chat-panel hidden">
+    <header>
+      <strong>Thermal Sheet Assistant</strong>
+      <button id="closeChatBtn" class="mini-button">Close</button>
+    </header>
+    <div id="chatLog" class="chat-log"></div>
+    <div class="chat-controls">
+      <input id="thermalFileInput" type="file" accept=".pdf,.png,.jpg,.jpeg">
+      <select id="capacitySourceSelect">
+        <option value="Calculated AC Load">Calculated AC Load</option>
+        <option value="First Selection">First Selection</option>
+        <option value="Second Selection">Second Selection</option>
+      </select>
+      <select id="familyModelSelect">
+        <option value="FXSQ-A">FXSQ-A</option>
+        <option value="FXMQ-PbV1">FXMQ-PbV1</option>
+        <option value="Other">Other</option>
+      </select>
+      <input id="customFamilyModelInput" class="hidden" placeholder="Specify Family or Model">
+      <button id="addThermalSampleBtn" class="ghost-button">Show Headers Only</button>
+      <button id="confirmThermalBtn" class="primary-button">Extract Table</button>
+    </div>
+  </section>
+
+  <template id="nodeTemplate">
+    <article class="node">
+      <header class="node-header">
+        <h2></h2>
+        <button class="menu-button" title="Options">...</button>
+      </header>
+      <div class="node-menu hidden"></div>
+      <div class="node-body"></div>
+    </article>
+  </template>
+
+  <script src="/app.js"></script>
+</body>
+</html>
