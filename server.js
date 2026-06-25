@@ -8,6 +8,10 @@ let createClient = null;
 try {
   ({ createClient } = require("@supabase/supabase-js"));
 } catch {}
+let PDFDocument = null;
+try {
+  PDFDocument = require("pdfkit");
+} catch {}
 
 const PORT = process.env.PORT || 4173;
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4.1-mini";
@@ -1101,10 +1105,32 @@ async function handleApi(req, res) {
     if (!sourceQuote) return notFound(res);
     const quote = normalizeSalesItem("quotations", sourceQuote, store);
     const customer = (store.customers || []).find(item => cleanCell(item.name).toLowerCase() === cleanCell(quote.customer).toLowerCase()) || {};
-    const pdf = salesQuotationPdfBuffer({ quote, customer });
+    const pdf = await salesQuotationPdfBuffer({ quote, customer });
+    const filename = salesQuotationPdfFilename(quote);
+    const upload = {
+      id: id(),
+      originalName: filename,
+      storedName: `${id()}-${safeName(filename)}`,
+      mimeType: "application/pdf",
+      size: pdf.length,
+      createdAt: new Date().toISOString(),
+      category: "Sales Quotation PDF"
+    };
+    await saveUpload("sales-quotations", upload.storedName, pdf, upload.mimeType);
+    if (body.quoteId) {
+      const index = (store.quotations || []).findIndex(item => item.id === body.quoteId);
+      if (index >= 0) {
+        store.quotations[index] = {
+          ...store.quotations[index],
+          pdfUpload: upload,
+          lastPdfGeneratedAt: upload.createdAt
+        };
+        await writeSalesCrm(store);
+      }
+    }
     res.writeHead(200, {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="${salesQuotationPdfFilename(quote)}"`
+      "Content-Disposition": `attachment; filename="${filename}"`
     });
     return res.end(pdf);
   }
@@ -2373,7 +2399,8 @@ function purchaseOrderPdfFilename(order) {
   return `${safeName(order.poNo || "PO")}-${supplier}.pdf`.replace(/"/g, "");
 }
 
-function salesQuotationPdfBuffer(payload) {
+async function salesQuotationPdfBuffer(payload) {
+  if (PDFDocument) return salesQuotationPdfKitBuffer(payload);
   const input = {
     ...(payload || {}),
     letterheadPath: path.join(PUBLIC, "assets", "quotation-letterhead.jpg")
@@ -2387,6 +2414,189 @@ function salesQuotationPdfBuffer(payload) {
     throw new Error(message);
   }
   return result.stdout;
+}
+
+function salesQuotationPdfKitBuffer(payload) {
+  return new Promise((resolve, reject) => {
+    const quote = payload.quote || payload;
+    const customer = payload.customer || {};
+    const doc = new PDFDocument({ size: "A4", margin: 0, bufferPages: true });
+    const chunks = [];
+    doc.on("data", chunk => chunks.push(chunk));
+    doc.on("end", () => resolve(Buffer.concat(chunks)));
+    doc.on("error", reject);
+
+    const pageWidth = 595.28;
+    const pageHeight = 841.89;
+    const left = 46;
+    const tableWidth = pageWidth - left * 2;
+    const bottom = 86;
+    const letterhead = path.join(PUBLIC, "assets", "quotation-letterhead.jpg");
+
+    const drawBackground = () => {
+      if (fs.existsSync(letterhead)) {
+        doc.image(letterhead, 0, 0, { width: pageWidth, height: pageHeight });
+      }
+      doc.fillColor("#000000").strokeColor("#c5cddb").lineWidth(0.6);
+    };
+
+    const addPage = () => {
+      doc.addPage({ size: "A4", margin: 0 });
+      drawBackground();
+      return 142;
+    };
+
+    const writeWrapped = (text, x, y, width, options = {}) => {
+      doc.font(options.bold ? "Helvetica-Bold" : "Helvetica").fontSize(options.size || 8.6).fillColor("#000000");
+      doc.text(String(text || ""), x, y, {
+        width,
+        align: options.align || "left",
+        lineGap: options.lineGap || 1
+      });
+    };
+
+    const textHeight = (text, width, size = 8.6) => {
+      doc.font("Helvetica").fontSize(size);
+      return doc.heightOfString(String(text || ""), { width, lineGap: 1 });
+    };
+
+    const detailTable = (x, y, width) => {
+      const labelW = 88;
+      const valueW = 168;
+      const label2W = 96;
+      const value2W = width - labelW - valueW - label2W;
+      const rowH = 25;
+      const rows = [
+        ["Customer:", quote.customer, "Date:", formatPdfDate(quote.date)],
+        ["Contact Person:", customer.contact, "Quotation No:", quote.no],
+        ["Email:", customer.email, "Salesperson:", quote.salesperson],
+        ["Payment Terms:", quote.paymentTerms, "Availability:", quote.deliveryTime]
+      ];
+      const height = rowH * (rows.length + 1);
+      doc.rect(x, y, width, height).stroke("#000000");
+      let rowY = y;
+      for (const row of rows) {
+        doc.moveTo(x, rowY + rowH).lineTo(x + width, rowY + rowH).stroke();
+        const colX = [x + labelW, x + labelW + valueW, x + labelW + valueW + label2W];
+        for (const lineX of colX) doc.moveTo(lineX, rowY).lineTo(lineX, rowY + rowH).stroke();
+        writeWrapped(row[0], x + 6, rowY + 8, labelW - 10, { bold: true });
+        writeWrapped(row[1], x + labelW + 6, rowY + 8, valueW - 10);
+        writeWrapped(row[2], x + labelW + valueW + 6, rowY + 8, label2W - 10, { bold: true });
+        writeWrapped(row[3], x + labelW + valueW + label2W + 6, rowY + 8, value2W - 10);
+        rowY += rowH;
+      }
+      doc.moveTo(x + labelW, rowY).lineTo(x + labelW, rowY + rowH).stroke();
+      writeWrapped("Project:", x + 6, rowY + 8, labelW - 10, { bold: true });
+      writeWrapped(quote.project, x + labelW + 6, rowY + 8, width - labelW - 10);
+      return y + height;
+    };
+
+    const drawItemHeader = y => {
+      const widths = [42, tableWidth - 162, 60, 60];
+      doc.rect(left, y, tableWidth, 22).fillAndStroke("#e1e5eb", "#c5cddb");
+      let x = left;
+      ["S. No.", "Description", "Qty", "Unit"].forEach((title, index) => {
+        doc.strokeColor("#c5cddb").moveTo(x, y).lineTo(x, y + 22).stroke();
+        doc.font("Helvetica-Bold").fontSize(8.4).fillColor("#000000")
+          .text(title, x + 4, y + 7, { width: widths[index] - 8, align: "center" });
+        x += widths[index];
+      });
+      doc.moveTo(left + tableWidth, y).lineTo(left + tableWidth, y + 22).stroke();
+      return { y: y + 22, widths };
+    };
+
+    const drawItemRow = (item, serial, y, widths) => {
+      const descriptionHeight = textHeight(item.description, widths[1] - 14, 8.4);
+      const rowH = Math.max(24, descriptionHeight + 14);
+      if (y + rowH > pageHeight - bottom - 90) {
+        y = addPage();
+        ({ y, widths } = drawItemHeader(y));
+      }
+      doc.rect(left, y, tableWidth, rowH).stroke("#c5cddb");
+      let x = left;
+      for (const width of widths.slice(0, -1)) {
+        x += width;
+        doc.moveTo(x, y).lineTo(x, y + rowH).stroke();
+      }
+      const mid = y + rowH / 2 - 4;
+      writeWrapped(serial, left + 4, mid, widths[0] - 8, { align: "center" });
+      writeWrapped(item.description, left + widths[0] + 8, y + 8, widths[1] - 14, { size: 8.4 });
+      writeWrapped(trimNumber(item.qty), left + widths[0] + widths[1] + 4, mid, widths[2] - 8, { align: "center" });
+      writeWrapped(item.unit || "Nos", left + widths[0] + widths[1] + widths[2] + 4, mid, widths[3] - 8, { align: "center" });
+      return y + rowH;
+    };
+
+    const drawSummary = y => {
+      const itemSubtotal = (quote.items || []).reduce((sum, item) => sum + Number(item.qty || 0) * Number(item.unitPrice || 0), 0);
+      const manual = String(quote.manualSubtotal || "").replace(/,/g, "").trim();
+      const subtotal = manual ? Number(manual || 0) : itemSubtotal;
+      const discount = Number(quote.discount || 0);
+      const taxable = Math.max(0, subtotal - discount);
+      const vat = taxable * 0.05;
+      const net = taxable + vat;
+      const rows = [["Total", money(subtotal)]];
+      if (discount) {
+        rows.push(["Discount", `-${money(discount)}`]);
+        rows.push(["Subtotal", money(taxable)]);
+      }
+      rows.push(["VAT 5%", money(vat)], ["Net Amount", money(net)]);
+      y += 15;
+      for (const [label, value] of rows) {
+        doc.font("Helvetica-Bold").fontSize(8.5).fillColor("#000000");
+        doc.text(label, left + tableWidth - 155, y, { width: 80, align: "right" });
+        doc.text(value, left + tableWidth - 70, y, { width: 70, align: "right" });
+        y += 14;
+      }
+      return y + 8;
+    };
+
+    const drawBlock = (title, text, y) => {
+      if (!String(text || "").trim()) return y;
+      if (y > pageHeight - bottom - 50) y = addPage();
+      doc.font("Helvetica-Bold").fontSize(9).fillColor("#000000").text(title, left, y, { width: tableWidth });
+      y += 16;
+      doc.font("Helvetica").fontSize(8.3);
+      for (const raw of String(text || "").replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n")) {
+        const height = doc.heightOfString(raw || " ", { width: tableWidth, lineGap: 2 });
+        if (y + height > pageHeight - bottom) y = addPage();
+        doc.text(raw || " ", left, y, { width: tableWidth, lineGap: 2 });
+        y += Math.max(11, height);
+      }
+      return y + 8;
+    };
+
+    drawBackground();
+    doc.font("Helvetica-Bold").fontSize(14.5).fillColor("#07152f").text("Quotation", 0, 124, { width: pageWidth, align: "center" });
+    let y = detailTable(left, 154, tableWidth) + 20;
+    doc.font("Helvetica-Bold").fontSize(9.3).fillColor("#000000").text("Subject: Supply of Daikin AC Units", left, y);
+    y += 18;
+    doc.font("Helvetica").fontSize(8.9).text("Thank you very much for your valid enquiry. We are offering our best quote as below.", left, y);
+    y += 31;
+    let header = drawItemHeader(y);
+    y = header.y;
+    for (let index = 0; index < (quote.items || []).length; index += 1) {
+      y = drawItemRow(quote.items[index], index + 1, y, header.widths);
+    }
+    y = drawSummary(y);
+    y = drawBlock("Notes", quote.notes, y);
+    y = drawBlock("Terms & Conditions", quote.terms, y);
+    doc.end();
+  });
+}
+
+function formatPdfDate(value) {
+  const text = String(value || "").trim();
+  const iso = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (iso) return `${iso[3]}/${iso[2]}/${iso[1]}`;
+  const dmy = text.match(/^(\d{2})[-/](\d{2})[-/](\d{4})/);
+  if (dmy) return `${dmy[1]}/${dmy[2]}/${dmy[3]}`;
+  return text;
+}
+
+function trimNumber(value) {
+  const number = Number(value || 0);
+  if (!Number.isFinite(number)) return String(value || "");
+  return String(number).replace(/\.0+$/, "");
 }
 
 function salesQuotationPdfFilename(quote) {
