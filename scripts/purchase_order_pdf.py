@@ -205,18 +205,23 @@ def draw_item_row(c, item, x, y, col_widths, serial_no):
     tax_x = unit_x + col_widths[3]
     c.drawCentredString(tax_x + col_widths[4] / 2, text_y, f"{money(vat_percent).rstrip('0').rstrip('.')}%")
     amount_x = tax_x + col_widths[4]
-    c.drawRightString(amount_x + col_widths[5] - 10, text_y, amount_aed(base))
+    c.drawCentredString(amount_x + col_widths[5] / 2, text_y, money(base))
     return y - row_h
 
 
 def draw_summary(c, po, x, y):
     w = 210
     row_h = 36
+    discount = number(po.get("discount"))
     rows = [
         ("Untaxed Amount", amount_aed(po.get("subtotal"))),
+    ]
+    if discount:
+        rows.append(("Discount", f"-{amount_aed(discount)}"))
+    rows.extend([
         ("VAT 5%", amount_aed(po.get("vatTotal"))),
         ("Total", amount_aed(po.get("grandTotal"))),
-    ]
+    ])
     c.setLineWidth(0.45)
     for idx, (label, value) in enumerate(rows):
         row_y = y - idx * row_h
@@ -250,7 +255,7 @@ def draw_notes(c, notes, x, y):
     return y
 
 
-def paginate_items(items, first_limit=292, other_limit=560):
+def paginate_items(items, first_limit=292, other_limit=500):
     pages = []
     current = []
     used = 0
@@ -268,6 +273,20 @@ def paginate_items(items, first_limit=292, other_limit=560):
     return pages
 
 
+def page_items_height(items):
+    return sum(item_row_height(item) for item in items or [])
+
+
+def reserve_summary_page_if_needed(pages):
+    if not pages:
+        return [[]]
+    last_page_start_y = 528 if len(pages) == 1 else 626
+    last_page_end_y = last_page_start_y - page_items_height(pages[-1])
+    if pages[-1] and last_page_end_y < 354:
+        pages.append([])
+    return pages
+
+
 def main():
     payload = json.load(sys.stdin)
     po = payload.get("order") or payload
@@ -280,7 +299,7 @@ def main():
     table_x = margin
     table_w = width - margin * 2
     col_widths = [42, 176, 80, 86, 70, table_w - 454]
-    pages = paginate_items(items)
+    pages = reserve_summary_page_if_needed(paginate_items(items))
     total_pages = len(pages)
 
     for page_no, page_items in enumerate(pages, 1):

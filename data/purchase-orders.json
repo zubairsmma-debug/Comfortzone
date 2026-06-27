@@ -1,52 +1,8 @@
 {
   "settings": {
-    "nextPoNo": "PO-2026-1001"
+    "nextPoNo": "PO-2026-0001"
   },
-  "orders": [
-    {
-      "id": "6e158519-e5b8-4ae1-b295-4f660316af41",
-      "poNo": "PO-2026-1000",
-      "status": "Created",
-      "supplierName": "Daikin Air Conditioning",
-      "supplierAddress": "PO Box. 125833, Dubai, UAE",
-      "trn": "100032076000003",
-      "quotationNo": "1234567",
-      "quotationDate": "",
-      "purchaseRepresentative": "",
-      "poDate": "2026-06-19",
-      "projectName": "Sample",
-      "deliveryTerms": "",
-      "paymentTerms": "90 Days PDC",
-      "manualSubtotal": "5000",
-      "notes": "1. Invoice should be attached with delivery note signed by site supervisor.\n2. Attach LPO copy along with invoice.\n3. Delivery to be made as per schedule instruction provided to you.",
-      "sourceUploadId": "2a21d7c7-b4be-42cc-87d0-310df0f28846",
-      "createdAt": "2026-06-19T05:35:51.396Z",
-      "updatedAt": "2026-06-19T05:35:51.396Z",
-      "items": [
-        {
-          "id": "3d543705-88dc-4980-92d5-2cfe27070544",
-          "description": "fdmrn",
-          "modelNo": "",
-          "qty": 7,
-          "unitPrice": 0,
-          "vatPercent": 5,
-          "amount": 0
-        },
-        {
-          "id": "1781847394633.8584",
-          "description": "rxtq",
-          "modelNo": "",
-          "qty": 1,
-          "unitPrice": 0,
-          "vatPercent": 5,
-          "amount": 0
-        }
-      ],
-      "subtotal": 5000,
-      "vatTotal": 250,
-      "grandTotal": 5250
-    }
-  ],
+  "orders": [],
   "suppliers": [
     {
       "id": "9a55cc7f-1b6e-4c14-91d6-693b2491f327",
@@ -63,6 +19,70 @@
     }
   ],
   "uploads": [
+    {
+      "id": "9eee2b13-eb22-4ca9-8bca-1d4a1f460742",
+      "originalName": "Table sample upload.jpeg",
+      "storedName": "9eee2b13-eb22-4ca9-8bca-1d4a1f460742-Table sample upload.jpeg",
+      "mimeType": "image/jpeg",
+      "size": 131065,
+      "createdAt": "2026-06-27T05:49:19.191Z"
+    },
+    {
+      "id": "b0c67efa-ae30-4ab0-9b68-d20cda158683",
+      "originalName": "602777-AL MAHIRA TECHNICAL SERVICES L.L.C -20-06-2026.pdf",
+      "storedName": "b0c67efa-ae30-4ab0-9b68-d20cda158683-602777-AL MAHIRA TECHNICAL SERVICES L.L.C -20-06-2026.pdf",
+      "mimeType": "application/pdf",
+      "size": 543935,
+      "createdAt": "2026-06-27T05:25:46.751Z"
+    },
+    {
+      "id": "7d41ec27-92c7-4e6a-905b-6c51f88509f3",
+      "originalName": "alt-0233850(1) (1).pdf",
+      "storedName": "7d41ec27-92c7-4e6a-905b-6c51f88509f3-alt-0233850_1_ _1_.pdf",
+      "mimeType": "application/pdf",
+      "size": 97657,
+      "createdAt": "2026-06-27T05:03:10.012Z"
+    },
+    {
+      "id": "24256d65-2497-4f93-9305-2146475e1315",
+      "originalName": "alt-0233850(1) (1).pdf",
+      "storedName": "24256d65-2497-4f93-9305-2146475e1315-alt-0233850_1_ _1_.pdf",
+      "mimeType": "application/pdf",
+      "size": 97657,
+      "createdAt": "2026-06-27T04:49:18.326Z"
+    },
+    {
+      "id": "339e6653-7743-412e-bbaa-c92e10f2fefc",
+      "originalName": "alt-0233850(1) (1).pdf",
+      "storedName": "339e6653-7743-412e-bbaa-c92e10f2fefc-alt-0233850_1_ _1_.pdf",
+      "mimeType": "application/pdf",
+      "size": 97657,
+      "createdAt": "2026-06-27T04:30:41.995Z"
+    },
+    {
+      "id": "59a92ecb-4f9e-403b-a78a-9779c550287e",
+      "originalName": "alt-0233850(1) (1).pdf",
+      "storedName": "59a92ecb-4f9e-403b-a78a-9779c550287e-alt-0233850_1_ _1_.pdf",
+      "mimeType": "application/pdf",
+      "size": 97657,
+      "createdAt": "2026-06-26T13:19:31.626Z"
+    },
+    {
+      "id": "59af36ad-1568-4455-a85c-deed8987c08d",
+      "originalName": "602777-AL MAHIRA TECHNICAL SERVICES L.L.C -20-06-2026.pdf",
+      "storedName": "59af36ad-1568-4455-a85c-deed8987c08d-602777-AL MAHIRA TECHNICAL SERVICES L.L.C -20-06-2026.pdf",
+      "mimeType": "application/pdf",
+      "size": 543935,
+      "createdAt": "2026-06-26T13:17:20.589Z"
+    },
+    {
+      "id": "76f93366-6cc7-457d-ad5b-1a5cb49db06b",
+      "originalName": "602735-AL MAHIRA TECHNICAL SERVICES L.L.C -03-06-2026 (1) - Copy.pdf",
+      "storedName": "76f93366-6cc7-457d-ad5b-1a5cb49db06b-602735-AL MAHIRA TECHNICAL SERVICES L.L.C -03-06-2026 _1_ - Copy.pdf",
+      "mimeType": "application/pdf",
+      "size": 517934,
+      "createdAt": "2026-06-26T11:55:18.462Z"
+    },
     {
       "id": "2a21d7c7-b4be-42cc-87d0-310df0f28846",
       "originalName": "SQ-DXB-26-1273.pdf",

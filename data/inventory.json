@@ -1,6 +1,6 @@
 {
   "settings": {
-    "nextDeliveryNo": "DN-2063"
+    "nextDeliveryNo": "DN-2064"
   },
   "models": [],
   "customers": [
@@ -32,15 +32,6 @@
       "defaultDeliveryLocation": ""
     },
     {
-      "id": "7cbdd6dd-8678-494d-9c97-e0f0718f167f",
-      "customerName": "ddc",
-      "contactPerson": "ddc",
-      "phone": "",
-      "email": "",
-      "address": "",
-      "defaultDeliveryLocation": ""
-    },
-    {
       "id": "58dadb82-11c1-41a4-9972-bb48c47e7ea1",
       "customerName": "Kompany",
       "contactPerson": "Kompany",
@@ -68,6 +59,22 @@
       "mimeType": "application/pdf",
       "size": 2897487,
       "createdAt": "2026-06-17T11:42:12.644Z"
+    },
+    {
+      "id": "895e2943-f9de-40a8-b9a5-e456c893e50c",
+      "originalName": "Delivery note daikin.pdf",
+      "storedName": "895e2943-f9de-40a8-b9a5-e456c893e50c-Delivery note daikin.pdf",
+      "mimeType": "application/pdf",
+      "size": 549679,
+      "createdAt": "2026-06-26T12:56:33.242Z"
+    },
+    {
+      "id": "e4c322ac-dc86-4316-ac34-cde4407d4aaf",
+      "originalName": "Delivery note daikin.pdf",
+      "storedName": "e4c322ac-dc86-4316-ac34-cde4407d4aaf-Delivery note daikin.pdf",
+      "mimeType": "application/pdf",
+      "size": 549679,
+      "createdAt": "2026-06-27T07:31:33.285Z"
     }
   ]
 }

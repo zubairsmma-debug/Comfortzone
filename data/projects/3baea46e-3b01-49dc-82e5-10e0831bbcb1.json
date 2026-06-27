@@ -1,15 +1,15 @@
 {
-  "id": "9415340a-8f28-45f2-803e-a0c5c8d7d0ca",
-  "title": "Elite Villas Management",
-  "createdAt": "2026-06-23T11:36:39.085Z",
-  "updatedAt": "2026-06-23T11:41:24.984Z",
+  "id": "3baea46e-3b01-49dc-82e5-10e0831bbcb1",
+  "title": "PRIVATE VILLA, PLOT NO. 3323866, LA MER, JUMEIRA FIRST, DUBAI",
+  "createdAt": "2026-06-27T06:57:44.230Z",
+  "updatedAt": "2026-06-27T06:59:32.010Z",
   "details": {
-    "customer": "Elite Villas Management",
-    "contactPerson": "Fatima Al Sayed",
-    "telNo": "+971 4 888 2345",
-    "email": "fatima@elitevillas.ae",
-    "project": "",
-    "date": "2026-06-23",
+    "customer": "",
+    "contactPerson": "",
+    "telNo": "",
+    "email": "",
+    "project": "PRIVATE VILLA, PLOT NO. 3323866, LA MER, JUMEIRA FIRST, DUBAI",
+    "date": "2026-06-27",
     "location": "",
     "model": "Daikin",
     "validity": "Valid for 7 days",
@@ -17,11 +17,11 @@
     "preparedBy": ""
   },
   "quotation": {
-    "quotationNo": "QCZ-A/26/1006",
+    "quotationNo": "QCZ-A/26/1005",
     "generatedDocId": "",
     "generatedPdfId": ""
   },
-  "layoutVersion": "screenshot-v3",
+  "layoutVersion": "screenshot-v4",
   "nodes": [
     {
       "id": "details",
@@ -36,8 +36,8 @@
       "id": "thermal-upload",
       "type": "thermalUpload",
       "title": "Thermal Sheet",
-      "x": 145,
-      "y": 250,
+      "x": 150,
+      "y": 245,
       "locked": false,
       "data": {}
     },
@@ -45,52 +45,52 @@
       "id": "vrv-upload",
       "type": "vrvUpload",
       "title": "VRV Selection Report",
-      "x": 860,
-      "y": 6,
+      "x": 560,
+      "y": 245,
       "locked": false,
       "data": {
-        "uploadId": "753cf5f3-403e-4e98-8781-4d7c0d0539d1"
+        "uploadId": "b226d9dd-e3ba-4178-bd77-9c4f4704bf9b"
       }
     },
     {
       "id": "thermal-table",
       "type": "thermalTable",
       "title": "Export File",
-      "x": 10,
-      "y": 470,
+      "x": 45,
+      "y": 475,
       "locked": false,
-      "width": 1118,
-      "height": 260,
+      "width": 620,
+      "height": 205,
       "data": {}
     },
     {
       "id": "costing-table",
       "type": "costingTable",
       "title": "Costing Sheet",
-      "x": 725,
-      "y": 300,
+      "x": 880,
+      "y": 205,
       "locked": false,
       "width": 790,
-      "height": 704,
+      "height": 668,
       "data": {}
     },
     {
       "id": "boq-table",
       "type": "boqTable",
       "title": "BOQ / Price",
-      "x": 725,
-      "y": 1026,
+      "x": 880,
+      "y": 901,
       "locked": false,
       "width": 790,
-      "height": 658,
+      "height": 626,
       "data": {}
     },
     {
       "id": "quotation",
       "type": "quotation",
       "title": "Quotation",
-      "x": 1605,
-      "y": 1034,
+      "x": 1510,
+      "y": 929,
       "locked": false,
       "data": {}
     },
@@ -98,24 +98,24 @@
       "id": "vrv-schedule",
       "type": "vrvSchedule",
       "title": "VRV Schedule",
-      "x": 20,
-      "y": 1749,
+      "x": 130,
+      "y": 1592,
       "locked": false,
       "width": 1880,
-      "height": 1040,
+      "height": 1026,
       "data": {}
     }
   ],
   "uploads": [
     {
-      "id": "753cf5f3-403e-4e98-8781-4d7c0d0539d1",
-      "projectId": "9415340a-8f28-45f2-803e-a0c5c8d7d0ca",
+      "id": "b226d9dd-e3ba-4178-bd77-9c4f4704bf9b",
+      "projectId": "3baea46e-3b01-49dc-82e5-10e0831bbcb1",
       "nodeId": "vrv-upload",
-      "originalName": "Sample_VRV_Report.docx",
-      "storedName": "753cf5f3-403e-4e98-8781-4d7c0d0539d1-Sample_VRV_Report.docx",
+      "originalName": "VRVSelectionReport-PRIVATE VILLA, PLOT NO. 3323866, LA MER, JUMEIRA FIRST, DUBAI- (R0 TURKEY).docx",
+      "storedName": "b226d9dd-e3ba-4178-bd77-9c4f4704bf9b-VRVSelectionReport-PRIVATE VILLA_ PLOT NO. 3323866_ LA MER_ JUMEIRA FIRST_ DUBAI- _R0 TURKEY_.docx",
       "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       "size": 3230129,
-      "createdAt": "2026-06-23T11:39:43.330Z"
+      "createdAt": "2026-06-27T06:59:31.727Z"
     }
   ],
   "tables": {
@@ -157,7 +157,7 @@
           "Multiplier": 0.5,
           "Cost": 27142.5,
           "Amount": 54285,
-          "Selling Price / Unit": 32571
+          "Selling Price / Unit": 29856.75
         },
         {
           "S.No": 2,
@@ -168,29 +168,29 @@
           "Multiplier": 0.5,
           "Cost": 15180,
           "Amount": 15180,
-          "Selling Price / Unit": 18216
+          "Selling Price / Unit": 16698
         },
         {
           "S.No": 3,
           "Model": "RXYTQ14U5YF",
           "Qty": 1,
-          "TR": 11.200000000000001,
+          "TR": 11.2,
           "List Price": 52544,
           "Multiplier": 0.5,
           "Cost": 26272,
           "Amount": 26272,
-          "Selling Price / Unit": 31526.4
+          "Selling Price / Unit": 28899.2
         },
         {
           "S.No": 4,
           "Model": "RXYTQ12U5YF",
           "Qty": 3,
-          "TR": 9.600000000000001,
+          "TR": 9.6,
           "List Price": 43196,
           "Multiplier": 0.5,
           "Cost": 21598,
           "Amount": 64794,
-          "Selling Price / Unit": 25917.6
+          "Selling Price / Unit": 23757.8
         },
         {
           "S.No": 5,
@@ -201,7 +201,7 @@
           "Multiplier": 0.55,
           "Cost": 2473.9,
           "Amount": 22265.1,
-          "Selling Price / Unit": 2968.68
+          "Selling Price / Unit": 2721.29
         },
         {
           "S.No": 6,
@@ -212,7 +212,7 @@
           "Multiplier": 0.55,
           "Cost": 2549.8,
           "Amount": 2549.8,
-          "Selling Price / Unit": 3059.76
+          "Selling Price / Unit": 2804.78
         },
         {
           "S.No": 7,
@@ -223,7 +223,7 @@
           "Multiplier": 0.55,
           "Cost": 3275.25,
           "Amount": 16376.25,
-          "Selling Price / Unit": 3930.3
+          "Selling Price / Unit": 3602.78
         },
         {
           "S.No": 8,
@@ -234,7 +234,7 @@
           "Multiplier": 0.55,
           "Cost": 3374.8,
           "Amount": 16874,
-          "Selling Price / Unit": 4049.76
+          "Selling Price / Unit": 3712.28
         },
         {
           "S.No": 9,
@@ -245,7 +245,7 @@
           "Multiplier": 0.55,
           "Cost": 3846.7,
           "Amount": 42313.7,
-          "Selling Price / Unit": 4616.04
+          "Selling Price / Unit": 4231.37
         },
         {
           "S.No": 10,
@@ -256,7 +256,7 @@
           "Multiplier": 0.65,
           "Cost": 471.9,
           "Amount": 1415.7,
-          "Selling Price / Unit": 566.28
+          "Selling Price / Unit": 519.09
         },
         {
           "S.No": 11,
@@ -267,7 +267,7 @@
           "Multiplier": 0.65,
           "Cost": 523.25,
           "Amount": 3139.5,
-          "Selling Price / Unit": 627.9
+          "Selling Price / Unit": 575.58
         },
         {
           "S.No": 12,
@@ -278,7 +278,7 @@
           "Multiplier": 0.65,
           "Cost": 689.65,
           "Amount": 9655.1,
-          "Selling Price / Unit": 827.58
+          "Selling Price / Unit": 758.62
         },
         {
           "S.No": 13,
@@ -289,7 +289,7 @@
           "Multiplier": 0.65,
           "Cost": 1444.95,
           "Amount": 7224.75,
-          "Selling Price / Unit": 1733.94
+          "Selling Price / Unit": 1589.45
         },
         {
           "S.No": 14,
@@ -300,7 +300,7 @@
           "Multiplier": 0.65,
           "Cost": 730.6,
           "Amount": 1461.2,
-          "Selling Price / Unit": 876.72
+          "Selling Price / Unit": 803.66
         },
         {
           "S.No": 15,
@@ -311,7 +311,7 @@
           "Multiplier": 0.65,
           "Cost": 1419.6,
           "Amount": 1419.6,
-          "Selling Price / Unit": 1703.52
+          "Selling Price / Unit": 1561.56
         },
         {
           "S.No": 16,
@@ -328,10 +328,10 @@
       "summary": {
         "totalTR": 72,
         "totalCost": 285225.7,
-        "margin": 0.2,
-        "sellingPrice": 342270.84,
-        "profit": 57045.14,
-        "pricePerTon": 4753.76
+        "margin": 0.1,
+        "sellingPrice": 313748.27,
+        "profit": 28522.57,
+        "pricePerTon": 4357.61
       }
     },
     "boq": {
@@ -440,9 +440,9 @@
         }
       ],
       "summary": {
-        "total": 342270.84,
-        "vat": 17113.54,
-        "netAmount": 359384.38
+        "total": 313748.27,
+        "vat": 15687.41,
+        "netAmount": 329435.68
       }
     },
     "vrvSchedule": {

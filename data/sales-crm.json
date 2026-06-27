@@ -1,37 +1,9 @@
 {
   "settings": {
-    "nextQuotationNo": "CZ-QTN-2026-0001-R5",
+    "nextQuotationNo": "CZ-QTN-2026-0001-R7",
     "nextEnquiryNo": "EN-26-1002"
   },
   "leads": [
-    {
-      "id": "4caa4352-68fd-4228-8fc5-ffa10c8052ef",
-      "enquiryNo": "EN-26-1001",
-      "avatar": "KO",
-      "customer": "Kompany",
-      "phone": "97913245793",
-      "requirement": "AC Units",
-      "projectType": "Villa Project",
-      "location": "Al Ain",
-      "source": "Referral",
-      "status": "Contacted",
-      "followUp": "24/06/2026",
-      "priority": "Overdue"
-    },
-    {
-      "id": "3ca98ee0-6367-4070-a278-1b43a4181b95",
-      "enquiryNo": "EN-26",
-      "avatar": "DD",
-      "customer": "ddc",
-      "phone": "",
-      "requirement": "",
-      "projectType": "Villa Project",
-      "location": "",
-      "source": "WhatsApp",
-      "status": "New Lead",
-      "followUp": "",
-      "priority": "Planned"
-    },
     {
       "id": "10f81779-49c0-4ddd-9b4c-a24e8b292e03",
       "enquiryNo": "EN-26",
@@ -98,19 +70,6 @@
       "email": "",
       "address": "Al Ain",
       "detail": "AC Units",
-      "trn": ""
-    },
-    {
-      "id": "7cbdd6dd-8678-494d-9c97-e0f0718f167f",
-      "icon": "DD",
-      "name": "ddc",
-      "type": "Villa Project",
-      "contact": "ddc",
-      "role": "",
-      "phone": "",
-      "email": "",
-      "address": "",
-      "detail": "",
       "trn": ""
     },
     {

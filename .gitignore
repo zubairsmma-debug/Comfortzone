@@ -5,3 +5,4 @@ scripts/__pycache__/
 *.pyc
 .env
 node_modules/
+server-local*.log

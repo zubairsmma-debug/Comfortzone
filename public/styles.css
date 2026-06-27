@@ -244,6 +244,9 @@ button, input, select, textarea {
   overflow: auto;
   position: relative;
   transform-origin: 0 0;
+  background-color: #fbfcff;
+  background-image: radial-gradient(#d7dfed 1px, transparent 1px);
+  background-size: 16px 16px;
 }
 
 .canvas {
@@ -1590,31 +1593,50 @@ td[contenteditable="true"]:focus {
 
 .chat-panel {
   position: fixed;
-  right: 22px;
-  bottom: 22px;
-  width: 420px;
-  height: 520px;
-  background: #fff;
-  border: 1px solid #b8ccff;
-  border-radius: 10px;
-  box-shadow: var(--shadow);
-  z-index: 30;
-  display: flex;
-  flex-direction: column;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.24);
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 24px;
 }
 
-.chat-panel header {
-  padding: 12px 14px;
+.chat-card {
+  width: min(640px, 100%);
+  max-height: min(760px, calc(100vh - 48px));
+  background: #fff;
+  border: 1px solid #b8ccff;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chat-card header {
+  padding: 14px 16px;
   border-bottom: 1px solid var(--line);
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
+.chat-close-button {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--blue-soft);
+  color: var(--ink);
+  cursor: pointer;
+  font-weight: 800;
+}
+
 .chat-log {
   padding: 14px;
   overflow: auto;
-  flex: 1;
+  min-height: 280px;
+  flex: 1 1 auto;
   display: grid;
   align-content: start;
   gap: 10px;
@@ -1628,11 +1650,34 @@ td[contenteditable="true"]:focus {
   font-size: 13px;
 }
 
+.bubble-user {
+  justify-self: end;
+  max-width: 82%;
+  background: var(--blue);
+  color: #fff;
+}
+
+.bubble-assistant,
+.bubble-file {
+  justify-self: start;
+  max-width: 88%;
+}
+
 .chat-controls {
   border-top: 1px solid var(--line);
   padding: 12px;
   display: grid;
   gap: 8px;
+}
+
+.chat-reply-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+
+.chat-reply-row input {
+  min-width: 0;
 }
 
 .hidden { display: none !important; }

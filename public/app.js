@@ -36,6 +36,18 @@ let salesCrmState = null;
 let currentUser = null;
 let appSettings = null;
 let settingsDraft = null;
+let thermalChatSelection = {
+  mode: "regular",
+  capacitySource: "Calculated AC Load",
+  familyModel: "",
+  customInstruction: "",
+  requested: false,
+  appendResults: false
+};
+const defaultThermalColumns = [
+  "Indoor", "Room", "Mode", "Family or Model", "Cooling DBT", "Cooling WBT", "Heating T",
+  "Tot Cool Cap", "Sens Cool Cap", "Heat Cap", "Air Flow Rate"
+];
 const paymentTermOptions = ["CDC", "15 Days PDC", "30 Days PDC", "60 Days PDC", "90 Days PDC"];
 const defaultPurchaseNotes = `1. Invoice should be attached with delivery note signed by site supervisor.
 2. Attach LPO copy along with invoice.
@@ -195,7 +207,7 @@ async function init() {
   if (projectId) {
     await loadProject(projectId);
   } else {
-    await createProject();
+    await showSalesDesk("dashboard");
   }
 }
 
@@ -215,11 +227,14 @@ function bindShell() {
   $("#zoomFitBtn").addEventListener("click", zoomToFit);
   $("#searchInput").addEventListener("input", debounce(loadProjectList, 150));
   $("#closeChatBtn").addEventListener("click", () => $("#chatPanel").classList.add("hidden"));
-  $("#addThermalSampleBtn").addEventListener("click", addThermalSampleRows);
   $("#confirmThermalBtn").addEventListener("click", extractThermalFromChat);
   $("#thermalFileInput").addEventListener("change", uploadThermalFromChat);
-  $("#familyModelSelect").addEventListener("change", () => {
-    $("#customFamilyModelInput").classList.toggle("hidden", $("#familyModelSelect").value !== "Other");
+  $("#thermalChatSendBtn").addEventListener("click", sendThermalChatReply);
+  $("#thermalChatReplyInput").addEventListener("keydown", event => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      sendThermalChatReply();
+    }
   });
   document.querySelectorAll("[data-inventory-view]").forEach(button => {
     button.addEventListener("click", () => showInventory(button.dataset.inventoryView));
@@ -282,7 +297,7 @@ async function login(event) {
     const url = new URL(location.href);
     const projectId = url.searchParams.get("project");
     if (projectId) await loadProject(projectId);
-    else await createProject();
+    else await showSalesDesk("dashboard");
   } catch {
     $("#loginMessage").textContent = "Invalid email or password.";
   }
@@ -2199,8 +2214,10 @@ function purchaseOrderFormHtml(po) {
 }
 
 function purchaseSummaryHtml(po) {
+  const subtotalValue = String(po.manualSubtotal ?? "").trim() ? po.manualSubtotal : money(po.subtotal);
   return `
-    <div class="po-summary-row po-subtotal-row"><span>Subtotal (AED)</span><input id="poSubtotalInput" type="text" inputmode="decimal" data-po-subtotal value="${escapeHtml(po.manualSubtotal ?? money(po.subtotal))}"></div>
+    <div class="po-summary-row po-subtotal-row"><span>Subtotal (AED)</span><input id="poSubtotalInput" type="text" inputmode="decimal" data-po-subtotal value="${escapeHtml(subtotalValue)}"></div>
+    <div class="po-summary-row po-subtotal-row"><span>Discount (AED)</span><input id="poDiscountInput" type="text" inputmode="decimal" data-po-discount value="${escapeHtml(po.discount || "")}"></div>
     <div class="po-summary-row"><span>VAT Total (AED)</span><strong id="poVatTotal">${money(po.vatTotal)}</strong></div>
     <div class="po-summary-row po-summary-total"><strong>Grand Total (AED)</strong><strong id="poGrandTotal">${money(po.grandTotal)}</strong></div>
     <div class="po-status-box"><span>Status</span>${statusPill(po.status || "Draft")}</div>
@@ -2227,6 +2244,7 @@ function newPurchaseDraft() {
     projectName: "",
     paymentTerms: "",
     manualSubtotal: "",
+    discount: 0,
     notes: defaultPurchaseNotes,
     items: [newPurchaseItem()]
   };
@@ -2250,9 +2268,12 @@ function recalcPurchaseOrder(po) {
   const hasManualSubtotal = String(po.manualSubtotal ?? "").trim() !== "";
   const finalSubtotal = hasManualSubtotal ? (Number(String(po.manualSubtotal).replace(/,/g, "")) || 0) : subtotal;
   const vatRate = subtotal > 0 ? vatTotal / subtotal : averageVatRate(po.items);
+  const discount = Number(String(po.discount || "").replace(/,/g, "")) || 0;
+  const taxable = Math.max(0, finalSubtotal - discount);
   po.subtotal = finalSubtotal;
-  po.vatTotal = finalSubtotal * vatRate;
-  po.grandTotal = po.subtotal + po.vatTotal;
+  po.discount = discount;
+  po.vatTotal = taxable * vatRate;
+  po.grandTotal = taxable + po.vatTotal;
   return po;
 }
 
@@ -2267,6 +2288,8 @@ function refreshPurchaseTotals() {
   recalcPurchaseOrder(purchaseDraft);
   const subtotalInput = $("#poSubtotalInput");
   if (subtotalInput && String(purchaseDraft.manualSubtotal ?? "").trim() === "") subtotalInput.value = money(purchaseDraft.subtotal);
+  const discountInput = $("#poDiscountInput");
+  if (discountInput) discountInput.value = purchaseDraft.discount || "";
   $("#poVatTotal") && ($("#poVatTotal").textContent = money(purchaseDraft.vatTotal));
   $("#poGrandTotal") && ($("#poGrandTotal").textContent = money(purchaseDraft.grandTotal));
   (purchaseDraft.items || []).forEach((item, index) => {
@@ -2395,37 +2418,37 @@ function render() {
 }
 
 function applyCompactLayout(force) {
-  if (!force && state.layoutVersion === "screenshot-v3") return;
+  if (!force && state.layoutVersion === "screenshot-v5") return;
   const positions = {
     details: [0, 0],
-    "thermal-upload": [145, 250],
-    "vrv-upload": [860, 6],
-    "thermal-table": [10, 470],
-    "costing-table": [725, 300],
-    "boq-table": [725, 545],
-    quotation: [1605, 485],
-    "vrv-schedule": [20, 815]
+    "thermal-upload": [180, 255],
+    "vrv-upload": [640, 250],
+    "thermal-table": [55, 520],
+    "costing-table": [980, 130],
+    "boq-table": [970, 430],
+    quotation: [1680, 340],
+    "vrv-schedule": [170, 770]
   };
   state.nodes.forEach(node => {
     if (positions[node.id]) {
       node.x = positions[node.id][0];
       node.y = positions[node.id][1];
-      applyDefaultNodeSize(node);
+      applyDefaultNodeSize(node, true);
     }
   });
-  state.layoutVersion = "screenshot-v3";
+  state.layoutVersion = "screenshot-v5";
 }
 
 function autoLayoutWorkflow() {
   const positions = {
     details: [0, 0],
-    "thermal-upload": [145, 250],
-    "vrv-upload": [860, 6],
-    "thermal-table": [10, 470],
-    "costing-table": [725, 300],
-    "boq-table": [725, 545],
-    quotation: [1605, 485],
-    "vrv-schedule": [20, 815]
+    "thermal-upload": [180, 255],
+    "vrv-upload": [640, 250],
+    "thermal-table": [55, 520],
+    "costing-table": [980, 130],
+    "boq-table": [970, 430],
+    quotation: [1680, 340],
+    "vrv-schedule": [170, 770]
   };
   const thermalRows = state.tables.thermal.rows.length;
   const costingRows = state.tables.costing.rows.length;
@@ -2436,10 +2459,10 @@ function autoLayoutWorkflow() {
   const boqHeight = tableAutoHeight("boq", boqRows);
   const vrvHeight = tableAutoHeight("vrvSchedule", vrvRows);
 
-  positions["boq-table"][1] = positions["costing-table"][1] + costingHeight + 22;
-  positions.quotation[1] = positions["boq-table"][1] + 8;
+  positions["boq-table"][1] = positions["costing-table"][1] + costingHeight + 32;
+  positions.quotation[1] = Math.max(340, positions["boq-table"][1] - 100);
   positions["vrv-schedule"][1] = Math.max(
-    815,
+    770,
     positions["thermal-table"][1] + thermalHeight + 65,
     positions["boq-table"][1] + boqHeight + 65
   );
@@ -2450,24 +2473,25 @@ function autoLayoutWorkflow() {
       applyAutoNodeSize(node, { thermalHeight, costingHeight, boqHeight, vrvHeight });
     }
   });
+  canvas.style.width = "1950px";
   canvas.style.height = `${positions["vrv-schedule"][1] + vrvHeight + 180}px`;
 }
 
 function tableAutoHeight(key, rowCount) {
-  const rows = Math.max(1, rowCount);
-  if (key === "costing") return Math.max(270, 128 + rows * 28 + 128);
-  if (key === "boq") return Math.max(235, 118 + rows * 28 + 92);
-  if (key === "thermal") return Math.max(260, 118 + rows * 28 + 54);
-  if (key === "vrvSchedule") return Math.max(260, 118 + rows * 28 + 54);
+  const rows = Math.max(0, rowCount);
+  if (key === "costing") return Math.max(220, 110 + rows * 28 + 110);
+  if (key === "boq") return Math.max(190, 104 + rows * 28 + 74);
+  if (key === "thermal") return Math.max(205, 104 + rows * 28 + 54);
+  if (key === "vrvSchedule") return Math.max(230, 104 + rows * 28 + 54);
   return 240;
 }
 
 function applyAutoNodeSize(node, heights) {
   const sizes = {
-    "thermal-table": [620, heights.thermalHeight],
-    "costing-table": [790, heights.costingHeight],
-    "boq-table": [790, heights.boqHeight],
-    "vrv-schedule": [1880, heights.vrvHeight]
+    "thermal-table": [520, heights.thermalHeight],
+    "costing-table": [650, heights.costingHeight],
+    "boq-table": [650, heights.boqHeight],
+    "vrv-schedule": [1550, heights.vrvHeight]
   };
   if (sizes[node.id]) {
     node.width = Math.max(node.width || 0, sizes[node.id][0]);
@@ -2475,16 +2499,16 @@ function applyAutoNodeSize(node, heights) {
   }
 }
 
-function applyDefaultNodeSize(node) {
+function applyDefaultNodeSize(node, reset = false) {
   const sizes = {
-    "thermal-table": [620, 260],
-    "costing-table": [790, 270],
-    "boq-table": [790, 235],
-    "vrv-schedule": [1880, 260]
+    "thermal-table": [520, 205],
+    "costing-table": [650, 220],
+    "boq-table": [650, 190],
+    "vrv-schedule": [1550, 230]
   };
   if (sizes[node.id]) {
-    node.width = node.width || sizes[node.id][0];
-    node.height = node.height || sizes[node.id][1];
+    node.width = reset ? sizes[node.id][0] : node.width || sizes[node.id][0];
+    node.height = reset ? sizes[node.id][1] : node.height || sizes[node.id][1];
   }
 }
 
@@ -2496,7 +2520,6 @@ function setZoom(next) {
 function applyCanvasZoom() {
   canvas.style.transformOrigin = "0 0";
   canvas.style.transform = `scale(${canvasZoom})`;
-  canvas.parentElement.style.background = "#fbfcff";
   canvas.style.marginRight = `${Math.max(0, canvas.offsetWidth * (canvasZoom - 1))}px`;
   canvas.style.marginBottom = `${Math.max(0, canvas.offsetHeight * (canvasZoom - 1))}px`;
 }
@@ -2504,7 +2527,7 @@ function applyCanvasZoom() {
 function zoomToFit() {
   const wrap = $("#canvasView");
   if (!wrap) return;
-  const neededWidth = 1970;
+  const neededWidth = 1900;
   const available = Math.max(600, wrap.clientWidth - 30);
   setZoom(Math.min(0.9, Math.max(0.55, available / neededWidth)));
   wrap.scrollTo({ left: 0, top: 0, behavior: "smooth" });
@@ -2585,13 +2608,14 @@ function bindNode(el, node) {
 function menuItems(node) {
   const lockedText = node.locked ? "Unlock" : "Lock";
   const download = tableKeys[node.type] ? `<button data-action="download">Download Excel</button>` : "";
-  const quotationDownload = node.type === "quotation" ? `<button data-action="download-doc">Download Word</button><button data-action="download-pdf">PDF View</button>` : "";
+  const quotationDownload = node.type === "quotation" ? `<button data-action="download-doc">Download Word</button>` : "";
   const regen = tableKeys[node.type] ? `<button data-action="regenerate">Regenerate</button>` : "";
   const preview = node.type === "file" || node.type.includes("Upload") ? `<button data-action="preview">Preview File</button>` : "";
   const uploadDownload = ["thermalUpload", "vrvUpload"].includes(node.type) && node.data?.uploadId ? `<button data-action="download-upload">Download File</button>` : "";
+  const clearChat = node.type === "thermalUpload" ? `<button data-action="clear-thermal-chat">Clear Chat</button>` : "";
   const deleteUpload = node.data && node.data.uploadId ? `<button class="danger" data-action="delete-upload">Delete Uploaded File</button>` : "";
   const del = tableKeys[node.type] || node.type === "file" ? `<button class="danger" data-action="delete">Delete</button>` : "";
-  return `<button data-action="lock">${lockedText}</button>${download}${quotationDownload}${regen}${preview}${uploadDownload}${deleteUpload}${del}`;
+  return `<button data-action="lock">${lockedText}</button>${download}${quotationDownload}${regen}${preview}${uploadDownload}${clearChat}${deleteUpload}${del}`;
 }
 
 function bindMenu(menu, node) {
@@ -2610,6 +2634,7 @@ function bindMenu(menu, node) {
       if (action === "delete-upload") deleteUploadedFile(node);
       if (action === "preview") previewUpload(node);
       if (action === "download-upload") downloadUploadedFile(node);
+      if (action === "clear-thermal-chat") clearThermalChat();
       if (action === "download-doc") downloadQuotation();
       if (action === "download-pdf") openQuotationPrint();
     });
@@ -3347,6 +3372,11 @@ function handlePurchaseInput(event) {
     refreshPurchaseTotals();
     return;
   }
+  if (input.dataset.poDiscount !== undefined) {
+    purchaseDraft.discount = input.value;
+    refreshPurchaseTotals();
+    return;
+  }
   if (input.dataset.poField) {
     const key = input.dataset.poField;
     purchaseDraft[key] = key.toLowerCase().includes("date") ? parseInventoryDate(input.value) : input.value;
@@ -3372,7 +3402,10 @@ async function uploadPurchaseQuotation() {
     toast("Scanning quotation...");
     const result = await api("/api/purchase-orders/upload-quotation", { method: "POST", body: form });
     purchaseDraft = { ...newPurchaseDraft(), ...(result.order || {}) };
-    if (!String(purchaseDraft.notes || "").trim()) purchaseDraft.notes = defaultPurchaseNotes;
+    if (!String(purchaseDraft.manualSubtotal || "").trim() && Number(purchaseDraft.subtotal || 0) > 0) {
+      purchaseDraft.manualSubtotal = money(purchaseDraft.subtotal);
+    }
+    purchaseDraft.notes = defaultPurchaseNotes;
     if (!purchaseDraft.items || !purchaseDraft.items.length) purchaseDraft.items = [newPurchaseItem()];
     recalcPurchaseOrder(purchaseDraft);
     purchaseScreen = "form";
@@ -3874,84 +3907,385 @@ function fileBody(node) {
   return wrap;
 }
 
-function openThermalChat() {
+async function openThermalChat() {
+  syncThermalChatSelection();
   $("#chatPanel").classList.remove("hidden");
   $("#chatLog").innerHTML = "";
-  addChat("Upload the thermal sheet PDF or a zoomed screenshot here.");
-  addChat("I will scan the uploaded file with OpenAI vision, show detected capacity source options, then write the extracted preview directly into the Export File table.");
-  addChat("If a value is unclear, upload one or more zoomed screenshots here and click Extract Table again.");
-  thermalUploadIds().forEach(uploadId => {
+  if (state.thermalChatMessages && state.thermalChatMessages.length) {
+    renderThermalChatMessages();
+    return;
+  }
+  const uploadIds = thermalUploadIds();
+  if (!uploadIds.length) {
+    addChat("Upload the thermal sheet PDF or a zoomed screenshot here.");
+    return;
+  }
+  uploadIds.forEach(uploadId => {
     const upload = findUpload(uploadId);
     if (upload) addChatFile(upload);
   });
+  askThermalExtractionChoice();
 }
 
-function addChat(message) {
+function renderThermalChatMessages() {
+  $("#chatLog").innerHTML = "";
+  (state.thermalChatMessages || []).forEach(message => {
+    if (message.kind === "file") {
+      renderChatFile(message.name, message.size);
+    } else {
+      renderChatBubble(message.text, message.role || "assistant");
+    }
+  });
+}
+
+function renderChatBubble(message, role = "assistant") {
   const bubble = div("bubble");
+  bubble.classList.add(role === "user" ? "bubble-user" : "bubble-assistant");
   bubble.textContent = message;
   $("#chatLog").appendChild(bubble);
   $("#chatLog").scrollTop = $("#chatLog").scrollHeight;
 }
 
+function addChat(message, role = "assistant") {
+  renderChatBubble(message, role);
+  if (state) {
+    state.thermalChatMessages = state.thermalChatMessages || [];
+    state.thermalChatMessages.push({ kind: "text", role, text: message });
+    scheduleProjectSave();
+  }
+}
+
 function addChatFile(upload) {
+  renderChatFile(upload.originalName, upload.size);
+  if (state) {
+    state.thermalChatMessages = state.thermalChatMessages || [];
+    state.thermalChatMessages.push({ kind: "file", name: upload.originalName, size: upload.size });
+    scheduleProjectSave();
+  }
+}
+
+function renderChatFile(name, size) {
   const bubble = div("bubble");
-  bubble.innerHTML = `<strong>${escapeHtml(upload.originalName)}</strong><br>${prettyBytes(upload.size)} uploaded`;
+  bubble.classList.add("bubble-file");
+  bubble.innerHTML = `<strong>${escapeHtml(name)}</strong><br>${prettyBytes(size)} uploaded`;
   $("#chatLog").appendChild(bubble);
   $("#chatLog").scrollTop = $("#chatLog").scrollHeight;
 }
 
-function addThermalSampleRows() {
+function clearThermalChat() {
+  if (!state) return;
+  state.thermalChatMessages = [];
+  state.thermalPendingUploadIds = [];
+  state.thermalChatSelection = {
+    mode: "regular",
+    capacitySource: "Calculated AC Load",
+    familyModel: "",
+    customInstruction: "",
+    requested: false,
+    appendResults: false
+  };
+  syncThermalChatSelection();
+  if (!$("#chatPanel").classList.contains("hidden")) {
+    $("#chatLog").innerHTML = "";
+    const uploadIds = thermalUploadIds();
+    if (uploadIds.length) {
+      uploadIds.forEach(uploadId => {
+        const upload = findUpload(uploadId);
+        if (upload) addChatFile(upload);
+      });
+      askThermalExtractionChoice();
+    } else {
+      addChat("Upload the thermal sheet PDF or a zoomed screenshot here.");
+    }
+  }
+  saveProject();
+}
+
+function clearThermalTable(resetColumns = false) {
+  if (!state?.tables?.thermal) return;
+  if (resetColumns || !state.tables.thermal.columns?.length) {
+    state.tables.thermal.columns = [...defaultThermalColumns];
+  }
   state.tables.thermal.rows = [];
   buildVrvSchedule();
-  addChat("Headers are visible now. No values were inserted because sample/demo values are disabled.");
+  autoLayoutWorkflow();
   render();
+  saveProject();
+}
+
+function syncThermalChatSelection() {
+  const saved = state?.thermalChatSelection || {};
+  thermalChatSelection = {
+    mode: saved.mode || thermalChatSelection.mode || "regular",
+    capacitySource: saved.capacitySource || thermalChatSelection.capacitySource || "Calculated AC Load",
+    familyModel: saved.familyModel || thermalChatSelection.familyModel || "",
+    customInstruction: saved.customInstruction || thermalChatSelection.customInstruction || "",
+    requested: !!saved.requested || !!thermalChatSelection.requested,
+    appendResults: !!saved.appendResults || !!thermalChatSelection.appendResults
+  };
+  if (state) state.thermalChatSelection = { ...thermalChatSelection };
+}
+
+function thermalSelectionLabel() {
+  if (thermalChatSelection.mode === "custom") return `custom extraction: ${thermalChatSelection.customInstruction}`;
+  return thermalChatSelection.familyModel
+    ? `${thermalChatSelection.capacitySource}, model ${thermalChatSelection.familyModel}`
+    : `${thermalChatSelection.capacitySource}, no model specified`;
+}
+
+async function sendThermalChatReply() {
+  const input = $("#thermalChatReplyInput");
+  const text = input.value.trim();
+  if (!text) return;
+  addChat(text, "user");
+  const parsed = parseThermalChatReply(text);
+  if (parsed.clearTable) {
+    input.value = "";
+    clearThermalTable(parsed.resetFlow);
+    if (parsed.resetFlow) {
+      thermalChatSelection = {
+        ...thermalChatSelection,
+        mode: "regular",
+        customInstruction: "",
+        requested: false,
+        appendResults: false
+      };
+      if (state) {
+        state.thermalChatSelection = { ...thermalChatSelection };
+        scheduleProjectSave();
+      }
+      addChat("Export File table cleared. We can generate from the beginning now. What do you want to extract?");
+      askThermalExtractionChoice();
+    } else {
+      addChat("Export File table cleared.");
+    }
+    return;
+  }
+  if (parsed.feedbackOnly) {
+    input.value = "";
+    addChat("Understood. Tell me what is wrong or what should change, for example: use First Selection, add Air Flow Rate, or upload a clearer screenshot and say verify again.");
+    return;
+  }
+  if (parsed.append && !parsed.customInstruction && thermalChatSelection.requested) {
+    thermalChatSelection = { ...thermalChatSelection, appendResults: true, requested: true };
+    if (state) {
+      state.thermalChatSelection = { ...thermalChatSelection };
+      scheduleProjectSave();
+    }
+    input.value = "";
+    const pendingIds = state?.thermalPendingUploadIds || [];
+    if (pendingIds.length) {
+      addChat("Ok. I will extract the newly uploaded screenshot part(s) and add the rows below the existing Export File table.");
+      await extractThermalFromChat({ uploadIds: pendingIds });
+      state.thermalPendingUploadIds = [];
+      saveProject();
+    } else {
+      addChat("Ok. Upload the next screenshot part(s), and I will extract them and add the rows below the existing Export File table.");
+    }
+    return;
+  }
+  if (parsed.mode === "custom") {
+    thermalChatSelection = {
+      ...thermalChatSelection,
+      mode: "custom",
+      customInstruction: parsed.customInstruction,
+      requested: true,
+      appendResults: !!parsed.append
+    };
+    if (state) {
+      state.thermalChatSelection = { ...thermalChatSelection };
+      scheduleProjectSave();
+    }
+    input.value = "";
+    addChat(parsed.append ? "Ok. Reading the file now and adding the extracted rows below the current table." : "Ok. Reading the file now and placing the extracted table in the Export File table.");
+    await extractThermalFromChat();
+    return;
+  }
+  if (parsed.mode === "regular") {
+    thermalChatSelection.mode = "regular";
+  }
+  if (parsed.mode === "regular" && parsed.useDefaultRegular) {
+    thermalChatSelection = {
+      ...thermalChatSelection,
+      mode: "regular",
+      capacitySource: parsed.capacitySource || thermalChatSelection.capacitySource || "Calculated AC Load",
+      familyModel: "",
+      requested: true,
+      appendResults: !!parsed.append
+    };
+    if (state) {
+      state.thermalChatSelection = { ...thermalChatSelection };
+      scheduleProjectSave();
+    }
+    input.value = "";
+    addChat(`Ok, I will use the fixed VRV Export File template with ${thermalSelectionLabel()}.`);
+    await extractThermalFromChat();
+    return;
+  }
+  if (parsed.regenerate && thermalChatSelection.requested) {
+    thermalChatSelection = { ...thermalChatSelection, appendResults: !!parsed.append };
+    if (state) {
+      state.thermalChatSelection = { ...thermalChatSelection };
+      scheduleProjectSave();
+    }
+    input.value = "";
+    addChat(`Ok, I will verify/regenerate using ${thermalSelectionLabel()}.`);
+    const pendingIds = state?.thermalPendingUploadIds || [];
+    await extractThermalFromChat({ uploadIds: pendingIds.length ? pendingIds : undefined });
+    if (pendingIds.length) {
+      state.thermalPendingUploadIds = [];
+      saveProject();
+    }
+    return;
+  }
+  if (parsed.mode === "regular" && !parsed.capacitySource && !parsed.familyModel) {
+    addChat("Ok, we will use the regular VRV export template. Which capacity source should I use? If you want a model/family, mention it explicitly.");
+    input.value = "";
+    return;
+  }
+  if (!parsed.capacitySource && !parsed.familyModel && parsed.mode !== "regular") {
+    addChat("Tell me what to extract. For the fixed Export File format, reply: VRV export template. For custom columns, reply: extract columns Indoor, Room, Air Flow Rate.");
+    return;
+  }
+  thermalChatSelection = {
+    ...thermalChatSelection,
+    mode: "regular",
+    capacitySource: parsed.capacitySource || thermalChatSelection.capacitySource,
+    familyModel: parsed.familyModel || ((parsed.regenerate || parsed.append) ? thermalChatSelection.familyModel : ""),
+    requested: true,
+    appendResults: !!parsed.append
+  };
+  if (state) {
+    state.thermalChatSelection = { ...thermalChatSelection };
+    scheduleProjectSave();
+  }
+  input.value = "";
+  addChat(parsed.append ? `Ok, I will use ${thermalSelectionLabel()} and add the extracted rows below the current table.` : `Ok, I will use the regular VRV template with ${thermalSelectionLabel()}. Reading the file now.`);
+  await extractThermalFromChat();
+}
+
+function parseThermalChatReply(text) {
+  const lower = text.toLowerCase();
+  const clearTable = /\b(clear|empty|remove|delete)\b.*\b(table|export file|export)\b|\b(clear table|empty table)\b/.test(lower);
+  const resetFlow = /\b(start over|from first|from beginning|generate from first|fresh|restart)\b/.test(lower);
+  if (clearTable || resetFlow) return { clearTable: true, resetFlow };
+  const wantsRegular = /\bvrv\b|regular template|thermal template|export template|export file template|export file|fixed template/.test(lower);
+  const feedbackOnly = /\b(wrong|mistake|incorrect|not correct|bad extraction|error)\b/.test(lower) &&
+    !/\b(extract|regenerate|verify|recheck|check again|rerun|retry|use|add|include|column|columns|first|second|calculated|continue|append)\b/.test(lower);
+  if (feedbackOnly) return { feedbackOnly: true };
+  const wantsRegenerate = /\b(regenerate|verify|recheck|check again|rerun|retry)\b/.test(lower);
+  const wantsAppend = /\b(continue|append|add below|below|next screenshot|next page|remaining|rest)\b/.test(lower);
+  const explicitCustom = /\b(custom|specific|particular)\b.*\b(column|columns|table)\b|\b(column|columns)\b/.test(lower);
+  const wantsCustom = !wantsRegular && explicitCustom;
+  if (wantsCustom) {
+    return {
+      mode: "custom",
+      customInstruction: wantsAppend ? `${text}. Continue from the newly uploaded screenshot(s) and append the extracted rows below the existing table.` : text,
+      append: wantsAppend
+    };
+  }
+  let capacitySource = "";
+  if (lower.includes("first")) capacitySource = "First Selection";
+  else if (lower.includes("second")) capacitySource = "Second Selection";
+  else if (lower.includes("calculated") || lower.includes("ac load")) capacitySource = "Calculated AC Load";
+
+  const modelByLabel = text.match(/\b(?:model|family)\s*(?:is|:|-)?\s*([a-z0-9-]+)/i);
+  const modelByCode = text.match(/\b(FX[A-Z0-9-]*(?:-[A-Z0-9]+)?|[A-Z]{2,}\d{2,}[A-Z0-9-]*)\b/i);
+  const familyModel = (modelByLabel?.[1] || modelByCode?.[1] || "").trim().toUpperCase();
+  return {
+    mode: wantsRegular || wantsRegenerate || wantsAppend ? "regular" : "",
+    capacitySource,
+    familyModel,
+    regenerate: wantsRegenerate,
+    append: wantsAppend,
+    useDefaultRegular: wantsRegular && !capacitySource && !familyModel
+  };
 }
 
 async function uploadThermalFromChat() {
   const input = $("#thermalFileInput");
-  if (!input.files[0]) return;
+  const files = Array.from(input.files || []);
+  if (!files.length) return;
   await ensureProjectSaved({ hidden: true });
-  const form = new FormData();
-  const isFirst = !thermalUploadIds().length;
-  form.append("nodeId", isFirst ? "thermal-upload" : "thermal-screenshot");
-  form.append("file", input.files[0]);
-  const upload = await api(`/api/projects/${state.id}/uploads`, { method: "POST", body: form });
+  const uploaded = [];
+  for (const file of files) {
+    const form = new FormData();
+    const isFirst = !thermalUploadIds().length && !uploaded.length;
+    form.append("nodeId", isFirst ? "thermal-upload" : "thermal-screenshot");
+    form.append("file", file);
+    const upload = await api(`/api/projects/${state.id}/uploads`, { method: "POST", body: form });
+    uploaded.push(upload);
+  }
   const project = await api(`/api/projects/${state.id}`);
   state.uploads = project.uploads;
   state.nodes = project.nodes;
-  state.thermalChatUploadIds = [...new Set([...(state.thermalChatUploadIds || []), upload.id])];
-  addChatFile(upload);
-  addChat("Scanning uploaded thermal file with OpenAI vision...");
-  const scan = await scanThermal(true);
-  applyThermalScanOptions(scan);
-  addChat(scan.message || "Scan complete. Select capacity source/model, then click Extract Table.");
+  state.thermalChatUploadIds = [...new Set([...(state.thermalChatUploadIds || []), ...uploaded.map(upload => upload.id)])];
+  state.thermalPendingUploadIds = uploaded.map(upload => upload.id);
+  uploaded.forEach(addChatFile);
+  if (thermalChatSelection.requested) {
+    if (thermalChatSelection.appendResults) {
+      addChat(`${uploaded.length > 1 ? "Files added" : "Screenshot/file added"}. Should I extract these new screenshot(s) and add the rows below? Reply: continue.`);
+    } else {
+      addChat(`${uploaded.length > 1 ? "Files added" : "Screenshot/file added"}. Should I verify the table again using these screenshot(s)? Reply: verify again.`);
+    }
+  } else {
+    askThermalExtractionChoice();
+  }
   input.value = "";
   render();
   saveProject();
 }
 
-function selectedFamilyModel() {
-  const selected = $("#familyModelSelect").value;
-  if (selected === "Other") return $("#customFamilyModelInput").value.trim() || "Other";
-  return selected;
+function askThermalExtractionChoice() {
+  addChat("What do you want to extract?");
+  addChat("For the regular VRV export, reply like: VRV first selection. Mention a model only if you want it filled.");
+  addChat("For any other table, tell me the table or columns, for example: extract columns Indoor, Room, Air Flow Rate.");
 }
 
-async function extractThermalFromChat() {
+async function extractThermalFromChat(options = {}) {
   if (!thermalUploadIds().length) {
     addChat("Please upload a thermal sheet PDF or screenshot first.");
     return;
   }
-  addChat(`Selected ${$("#capacitySourceSelect").value} and ${selectedFamilyModel()}.`);
+  syncThermalChatSelection();
+  if (thermalChatSelection.mode === "custom" && !thermalChatSelection.customInstruction) {
+    addChat("Please tell me which table or columns to extract before clicking Extract Table.");
+    return;
+  }
+  addChat(`Selected ${thermalSelectionLabel()}.`);
   addChat("Extracting values into the Export File table...");
-  const extracted = await scanThermal(false);
+  const extracted = await scanThermal(false, { uploadIds: options.uploadIds });
   applyThermalScanOptions(extracted);
   if (extracted.rows && extracted.rows.length) {
-    state.tables.thermal.rows = extracted.rows;
+    state.tables.thermal.columns = [...defaultThermalColumns];
+    state.tables.thermal.rows = thermalChatSelection.appendResults
+      ? [...(state.tables.thermal.rows || []), ...extracted.rows]
+      : extracted.rows;
     buildVrvSchedule();
     autoLayoutWorkflow();
     addChat(extracted.message || "Preview table is ready in the Export File table. Please verify and edit there before downloading Excel.");
     if (extracted.unclearFields && extracted.unclearFields.length) {
       addChat(`Unable to read clearly: ${extracted.unclearFields.join(", ")}. Upload a higher-resolution or zoomed screenshot.`);
+    }
+  } else if (extracted.customColumns && extracted.customRows && extracted.customColumns.length) {
+    const nextRows = extracted.customRows.map(row => {
+      const next = {};
+      extracted.customColumns.forEach((column, index) => {
+        next[column] = Array.isArray(row) ? (row[index] || "") : (row[column] || "");
+      });
+      return next;
+    });
+    const existingColumns = state.tables.thermal.columns || [];
+    state.tables.thermal.columns = thermalChatSelection.appendResults && existingColumns.length
+      ? existingColumns
+      : extracted.customColumns;
+    state.tables.thermal.rows = thermalChatSelection.appendResults
+      ? [...(state.tables.thermal.rows || []), ...nextRows]
+      : nextRows;
+    autoLayoutWorkflow();
+    addChat(extracted.message || "Custom table extraction is ready in the Export File table.");
+    if (extracted.unclearFields && extracted.unclearFields.length) {
+      addChat(`Unable to read clearly: ${extracted.unclearFields.join(", ")}. Upload a zoomed screenshot of those parts and I will read it again.`);
     }
   } else {
     addChat(extracted.message || "No rows were extracted. Upload a clearer screenshot and try again.");
@@ -3960,24 +4294,31 @@ async function extractThermalFromChat() {
   saveProject();
 }
 
-async function scanThermal(previewOnly) {
+async function scanThermal(previewOnly, overrides = {}) {
+  const selection = { ...thermalChatSelection, ...overrides };
   return api(`/api/projects/${state.id}/extract/thermal-vision`, {
     method: "POST",
     body: JSON.stringify({
-      uploadIds: thermalUploadIds(),
-      capacitySource: $("#capacitySourceSelect").value,
-      familyModel: selectedFamilyModel(),
+      uploadIds: selection.uploadIds || thermalUploadIds(),
+      mode: selection.mode,
+      capacitySource: selection.capacitySource,
+      familyModel: selection.familyModel,
+      customInstruction: selection.customInstruction,
+      customExtraction: selection.customExtraction !== undefined ? selection.customExtraction : selection.mode === "custom",
       previewOnly
     })
   });
 }
 
 function applyThermalScanOptions(result) {
+  if (thermalChatSelection.mode === "custom") return;
   if (result.capacitySources && result.capacitySources.length) {
-    const select = $("#capacitySourceSelect");
-    const current = select.value;
-    select.innerHTML = result.capacitySources.map(source => `<option value="${escapeHtml(source)}">${escapeHtml(source)}</option>`).join("");
-    select.value = result.capacitySources.includes(current) ? current : result.capacitySources[0];
+    const current = thermalChatSelection.capacitySource;
+    if (!result.capacitySources.includes(current)) {
+      thermalChatSelection.capacitySource = result.capacitySources[0];
+      if (state) state.thermalChatSelection = { ...thermalChatSelection };
+    }
+    addChat(`Detected source options: ${result.capacitySources.join(", ")}. Reply with the one you want to use.`);
   }
 }
 
@@ -4067,7 +4408,7 @@ function buildCosting(materialRows) {
       "S.No": index + 1,
       Model: model,
       Qty: qty,
-      TR: item ? item.tr || 0 : "",
+      TR: item ? round2(item.tr || 0) : "",
       "List Price": item ? item.listPrice : "",
       Multiplier: item ? item.multiplier : "",
       Cost: "",
@@ -4092,6 +4433,7 @@ function recalcCosting() {
     const multiplier = num(row.Multiplier);
     const cost = list && multiplier ? list * multiplier : num(row.Cost);
     const amount = cost * qty;
+    if (row.TR !== "" && row.TR != null) row.TR = round2(tr);
     row.Cost = cost ? round2(cost) : "";
     row.Amount = amount ? round2(amount) : "";
     row["Selling Price / Unit"] = cost ? round2(cost * (1 + margin)) : "";

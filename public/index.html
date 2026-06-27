@@ -105,26 +105,20 @@
   </section>
 
   <section id="chatPanel" class="chat-panel hidden">
-    <header>
-      <strong>Thermal Sheet Assistant</strong>
-      <button id="closeChatBtn" class="mini-button">Close</button>
-    </header>
-    <div id="chatLog" class="chat-log"></div>
-    <div class="chat-controls">
-      <input id="thermalFileInput" type="file" accept=".pdf,.png,.jpg,.jpeg">
-      <select id="capacitySourceSelect">
-        <option value="Calculated AC Load">Calculated AC Load</option>
-        <option value="First Selection">First Selection</option>
-        <option value="Second Selection">Second Selection</option>
-      </select>
-      <select id="familyModelSelect">
-        <option value="FXSQ-A">FXSQ-A</option>
-        <option value="FXMQ-PbV1">FXMQ-PbV1</option>
-        <option value="Other">Other</option>
-      </select>
-      <input id="customFamilyModelInput" class="hidden" placeholder="Specify Family or Model">
-      <button id="addThermalSampleBtn" class="ghost-button">Show Headers Only</button>
-      <button id="confirmThermalBtn" class="primary-button">Extract Table</button>
+    <div class="chat-card">
+      <header>
+        <strong>Thermal Sheet Assistant</strong>
+        <button id="closeChatBtn" class="chat-close-button" aria-label="Close thermal assistant">X</button>
+      </header>
+      <div id="chatLog" class="chat-log"></div>
+      <div class="chat-controls">
+        <input id="thermalFileInput" type="file" accept=".pdf,.png,.jpg,.jpeg" multiple>
+        <div class="chat-reply-row">
+          <input id="thermalChatReplyInput" type="text">
+          <button id="thermalChatSendBtn" class="ghost-button">Send</button>
+        </div>
+        <button id="confirmThermalBtn" class="primary-button">Extract Table</button>
+      </div>
     </div>
   </section>
 

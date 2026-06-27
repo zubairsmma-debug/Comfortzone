@@ -1,27 +1,27 @@
 {
-  "id": "cef7cf86-e812-4585-a44b-6c192005efbf",
-  "title": "Villa AC Replacement - Jumeirah",
-  "createdAt": "2026-06-22T11:01:26.855Z",
-  "updatedAt": "2026-06-22T11:02:00.984Z",
+  "id": "65226945-af21-4bc1-a913-926b18a02fb6",
+  "title": "PRIVATE VILLA, PLOT NO. 3323866, LA MER, JUMEIRA FIRST, DUBAI",
+  "createdAt": "2026-06-27T07:10:41.162Z",
+  "updatedAt": "2026-06-27T07:16:36.443Z",
   "details": {
-    "customer": "Elite Villas Management",
-    "contactPerson": "Fatima Al Sayed",
-    "telNo": "+971 4 888 2345",
-    "email": "fatima@elitevillas.ae",
-    "project": "Villa AC Replacement - Jumeirah",
-    "date": "2026-06-22",
-    "location": "Jumeirah 1, Dubai",
+    "customer": "",
+    "contactPerson": "",
+    "telNo": "",
+    "email": "",
+    "project": "PRIVATE VILLA, PLOT NO. 3323866, LA MER, JUMEIRA FIRST, DUBAI",
+    "date": "2026-06-27",
+    "location": "",
     "model": "Daikin",
     "validity": "Valid for 7 days",
     "enquiryNo": "",
     "preparedBy": ""
   },
   "quotation": {
-    "quotationNo": "QCZ-A/26/1003",
+    "quotationNo": "QCZ-A/26/1006",
     "generatedDocId": "",
     "generatedPdfId": ""
   },
-  "layoutVersion": "screenshot-v3",
+  "layoutVersion": "screenshot-v5",
   "nodes": [
     {
       "id": "details",
@@ -36,61 +36,63 @@
       "id": "thermal-upload",
       "type": "thermalUpload",
       "title": "Thermal Sheet",
-      "x": 145,
-      "y": 250,
+      "x": 180,
+      "y": 255,
       "locked": false,
-      "data": {}
+      "data": {
+        "uploadId": "78a172bb-ccfb-410c-9ea8-b246665569d8"
+      }
     },
     {
       "id": "vrv-upload",
       "type": "vrvUpload",
       "title": "VRV Selection Report",
-      "x": 860,
-      "y": 6,
+      "x": 640,
+      "y": 250,
       "locked": false,
       "data": {
-        "uploadId": "296299df-1cf9-4d00-a696-3d7cbaf7ac12"
+        "uploadId": "96e9a38b-c05d-418f-878c-aad8a81bfe07"
       }
     },
     {
       "id": "thermal-table",
       "type": "thermalTable",
       "title": "Export File",
-      "x": 10,
-      "y": 470,
+      "x": 55,
+      "y": 520,
       "locked": false,
-      "width": 620,
-      "height": 260,
+      "width": 520,
+      "height": 2426,
       "data": {}
     },
     {
       "id": "costing-table",
       "type": "costingTable",
       "title": "Costing Sheet",
-      "x": 725,
-      "y": 300,
+      "x": 980,
+      "y": 130,
       "locked": false,
-      "width": 790,
-      "height": 704,
+      "width": 650,
+      "height": 668,
       "data": {}
     },
     {
       "id": "boq-table",
       "type": "boqTable",
       "title": "BOQ / Price",
-      "x": 725,
-      "y": 1026,
+      "x": 970,
+      "y": 830,
       "locked": false,
-      "width": 790,
-      "height": 658,
+      "width": 650,
+      "height": 626,
       "data": {}
     },
     {
       "id": "quotation",
       "type": "quotation",
       "title": "Quotation",
-      "x": 1605,
-      "y": 1034,
+      "x": 1680,
+      "y": 730,
       "locked": false,
       "data": {}
     },
@@ -98,24 +100,74 @@
       "id": "vrv-schedule",
       "type": "vrvSchedule",
       "title": "VRV Schedule",
-      "x": 20,
-      "y": 1749,
+      "x": 170,
+      "y": 3011,
       "locked": false,
-      "width": 1880,
-      "height": 1040,
+      "width": 1550,
+      "height": 1026,
       "data": {}
     }
   ],
   "uploads": [
     {
-      "id": "296299df-1cf9-4d00-a696-3d7cbaf7ac12",
-      "projectId": "cef7cf86-e812-4585-a44b-6c192005efbf",
+      "id": "78a172bb-ccfb-410c-9ea8-b246665569d8",
+      "projectId": "65226945-af21-4bc1-a913-926b18a02fb6",
+      "nodeId": "thermal-upload",
+      "originalName": "Data Unit's-2.pdf",
+      "storedName": "78a172bb-ccfb-410c-9ea8-b246665569d8-Data Unit_s-2.pdf",
+      "mimeType": "application/pdf",
+      "size": 15382285,
+      "createdAt": "2026-06-27T07:10:48.938Z"
+    },
+    {
+      "id": "6aa03ae0-fe16-4b7e-9290-f156924cd286",
+      "projectId": "65226945-af21-4bc1-a913-926b18a02fb6",
+      "nodeId": "thermal-screenshot",
+      "originalName": "Screenshot 2026-06-27 110844.png",
+      "storedName": "6aa03ae0-fe16-4b7e-9290-f156924cd286-Screenshot 2026-06-27 110844.png",
+      "mimeType": "image/png",
+      "size": 1118525,
+      "createdAt": "2026-06-27T07:12:15.378Z"
+    },
+    {
+      "id": "3f5970e9-3428-4270-b2f5-93c54388df11",
+      "projectId": "65226945-af21-4bc1-a913-926b18a02fb6",
+      "nodeId": "thermal-screenshot",
+      "originalName": "Screenshot 2026-06-27 110901.png",
+      "storedName": "3f5970e9-3428-4270-b2f5-93c54388df11-Screenshot 2026-06-27 110901.png",
+      "mimeType": "image/png",
+      "size": 655718,
+      "createdAt": "2026-06-27T07:12:15.423Z"
+    },
+    {
+      "id": "4f07a3ef-587c-4f3f-8592-54983970613d",
+      "projectId": "65226945-af21-4bc1-a913-926b18a02fb6",
+      "nodeId": "thermal-screenshot",
+      "originalName": "Screenshot 2026-06-27 110919.png",
+      "storedName": "4f07a3ef-587c-4f3f-8592-54983970613d-Screenshot 2026-06-27 110919.png",
+      "mimeType": "image/png",
+      "size": 696844,
+      "createdAt": "2026-06-27T07:12:15.469Z"
+    },
+    {
+      "id": "ba6f4a10-7238-4a0d-82e1-0b0e9c6c439c",
+      "projectId": "65226945-af21-4bc1-a913-926b18a02fb6",
+      "nodeId": "thermal-screenshot",
+      "originalName": "Screenshot 2026-06-27 110943.png",
+      "storedName": "ba6f4a10-7238-4a0d-82e1-0b0e9c6c439c-Screenshot 2026-06-27 110943.png",
+      "mimeType": "image/png",
+      "size": 589735,
+      "createdAt": "2026-06-27T07:12:15.510Z"
+    },
+    {
+      "id": "96e9a38b-c05d-418f-878c-aad8a81bfe07",
+      "projectId": "65226945-af21-4bc1-a913-926b18a02fb6",
       "nodeId": "vrv-upload",
-      "originalName": "Sample_VRV_Report.docx",
-      "storedName": "296299df-1cf9-4d00-a696-3d7cbaf7ac12-Sample_VRV_Report.docx",
+      "originalName": "VRVSelectionReport-PRIVATE VILLA, PLOT NO. 3323866, LA MER, JUMEIRA FIRST, DUBAI- (R0 TURKEY).docx",
+      "storedName": "96e9a38b-c05d-418f-878c-aad8a81bfe07-VRVSelectionReport-PRIVATE VILLA_ PLOT NO. 3323866_ LA MER_ JUMEIRA FIRST_ DUBAI- _R0 TURKEY_.docx",
       "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       "size": 3230129,
-      "createdAt": "2026-06-22T11:01:46.324Z"
+      "createdAt": "2026-06-27T07:15:56.653Z"
     }
   ],
   "tables": {
@@ -133,7 +185,1061 @@
         "Heat Cap",
         "Air Flow Rate"
       ],
-      "rows": []
+      "rows": [
+        {
+          "Indoor": "UG-DS-01",
+          "Room": "PUMP ROOM",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "3.96",
+          "Sens Cool Cap": "3.64",
+          "Heat Cap": "",
+          "Air Flow Rate": "333.00"
+        },
+        {
+          "Indoor": "GF-DS-01",
+          "Room": "MAIN ENTRANCE",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "6.63",
+          "Sens Cool Cap": "6.19",
+          "Heat Cap": "",
+          "Air Flow Rate": "472.00"
+        },
+        {
+          "Indoor": "GF-DS-02",
+          "Room": "LV ROOM",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "4.98",
+          "Sens Cool Cap": "4.55",
+          "Heat Cap": "",
+          "Air Flow Rate": "375.00"
+        },
+        {
+          "Indoor": "GF-DS-03",
+          "Room": "TELEPHONE ROOM",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "3.96",
+          "Sens Cool Cap": "3.64",
+          "Heat Cap": "",
+          "Air Flow Rate": "333.00"
+        },
+        {
+          "Indoor": "GF-DS-04",
+          "Room": "GARBAGE ROOM",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "4.98",
+          "Sens Cool Cap": "4.55",
+          "Heat Cap": "",
+          "Air Flow Rate": "375.00"
+        },
+        {
+          "Indoor": "GF-DS-05",
+          "Room": "CCTV ROOM",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "3.96",
+          "Sens Cool Cap": "3.64",
+          "Heat Cap": "",
+          "Air Flow Rate": "333.00"
+        },
+        {
+          "Indoor": "PD-DS-01",
+          "Room": "LIFT LOBBY",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "3.96",
+          "Sens Cool Cap": "3.64",
+          "Heat Cap": "",
+          "Air Flow Rate": "333.00"
+        },
+        {
+          "Indoor": "1F-DS-01",
+          "Room": "APT-01",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "9.78",
+          "Sens Cool Cap": "8.76",
+          "Heat Cap": "",
+          "Air Flow Rate": "750.00"
+        },
+        {
+          "Indoor": "1F-DS-02",
+          "Room": "APT-02",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "4.98",
+          "Sens Cool Cap": "4.55",
+          "Heat Cap": "",
+          "Air Flow Rate": "375.00"
+        },
+        {
+          "Indoor": "1F-DS-03",
+          "Room": "APT-03",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "4.98",
+          "Sens Cool Cap": "4.55",
+          "Heat Cap": "",
+          "Air Flow Rate": "375.00"
+        },
+        {
+          "Indoor": "1F-DS-04",
+          "Room": "APT-04",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "4.98",
+          "Sens Cool Cap": "4.55",
+          "Heat Cap": "",
+          "Air Flow Rate": "375.00"
+        },
+        {
+          "Indoor": "1F-DS-05",
+          "Room": "APT-05",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "11.43",
+          "Sens Cool Cap": "10.30",
+          "Heat Cap": "",
+          "Air Flow Rate": "900.00"
+        },
+        {
+          "Indoor": "1F-DS-06",
+          "Room": "APT-06",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "9.78",
+          "Sens Cool Cap": "8.76",
+          "Heat Cap": "",
+          "Air Flow Rate": "750.00"
+        },
+        {
+          "Indoor": "1F-DS-07",
+          "Room": "APT-07",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "4.98",
+          "Sens Cool Cap": "4.55",
+          "Heat Cap": "",
+          "Air Flow Rate": "375.00"
+        },
+        {
+          "Indoor": "1F-DS-08",
+          "Room": "APT-08",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "4.98",
+          "Sens Cool Cap": "4.55",
+          "Heat Cap": "",
+          "Air Flow Rate": "375.00"
+        },
+        {
+          "Indoor": "1F-DS-09",
+          "Room": "APT-09",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "4.98",
+          "Sens Cool Cap": "4.55",
+          "Heat Cap": "",
+          "Air Flow Rate": "375.00"
+        },
+        {
+          "Indoor": "1F-DS-10",
+          "Room": "APT-10",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "4.98",
+          "Sens Cool Cap": "4.55",
+          "Heat Cap": "",
+          "Air Flow Rate": "375.00"
+        },
+        {
+          "Indoor": "1F-DS-11",
+          "Room": "APT-11",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "4.98",
+          "Sens Cool Cap": "4.55",
+          "Heat Cap": "",
+          "Air Flow Rate": "375.00"
+        },
+        {
+          "Indoor": "1F-DS-12",
+          "Room": "APT-12",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "9.78",
+          "Sens Cool Cap": "8.76",
+          "Heat Cap": "",
+          "Air Flow Rate": "750.00"
+        },
+        {
+          "Indoor": "1F-DS-13",
+          "Room": "APT-13",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "9.78",
+          "Sens Cool Cap": "8.76",
+          "Heat Cap": "",
+          "Air Flow Rate": "750.00"
+        },
+        {
+          "Indoor": "1F-DS-14",
+          "Room": "APT-14",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "6.63",
+          "Sens Cool Cap": "6.19",
+          "Heat Cap": "",
+          "Air Flow Rate": "472.00"
+        },
+        {
+          "Indoor": "1F-DS-15",
+          "Room": "APT-15",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "6.63",
+          "Sens Cool Cap": "6.19",
+          "Heat Cap": "",
+          "Air Flow Rate": "472.00"
+        },
+        {
+          "Indoor": "1F-DS-16A",
+          "Room": "APT-16 L&D",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "6.63",
+          "Sens Cool Cap": "6.19",
+          "Heat Cap": "",
+          "Air Flow Rate": "472.00"
+        },
+        {
+          "Indoor": "1F-DS-16B",
+          "Room": "APT-16 BEDROOM",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "3.96",
+          "Sens Cool Cap": "3.64",
+          "Heat Cap": "",
+          "Air Flow Rate": "333.00"
+        },
+        {
+          "Indoor": "1F-DS-17",
+          "Room": "GYMNASIUM",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "9.78",
+          "Sens Cool Cap": "8.76",
+          "Heat Cap": "",
+          "Air Flow Rate": "750.00"
+        },
+        {
+          "Indoor": "1F-DS-18",
+          "Room": "CORRIDOR",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "9.78",
+          "Sens Cool Cap": "8.76",
+          "Heat Cap": "",
+          "Air Flow Rate": "750.00"
+        },
+        {
+          "Indoor": "2F-DS-01",
+          "Room": "APT-01",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "9.78",
+          "Sens Cool Cap": "8.76",
+          "Heat Cap": "",
+          "Air Flow Rate": "750.00"
+        },
+        {
+          "Indoor": "2F-DS-02",
+          "Room": "APT-02",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "9.78",
+          "Sens Cool Cap": "8.76",
+          "Heat Cap": "",
+          "Air Flow Rate": "750.00"
+        },
+        {
+          "Indoor": "2F-DS-03",
+          "Room": "APT-03",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "3.96",
+          "Sens Cool Cap": "3.64",
+          "Heat Cap": "",
+          "Air Flow Rate": "333.00"
+        },
+        {
+          "Indoor": "2F-DS-04",
+          "Room": "APT-04",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "3.96",
+          "Sens Cool Cap": "3.64",
+          "Heat Cap": "",
+          "Air Flow Rate": "333.00"
+        },
+        {
+          "Indoor": "2F-DS-05",
+          "Room": "APT-05",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "3.96",
+          "Sens Cool Cap": "3.64",
+          "Heat Cap": "",
+          "Air Flow Rate": "333.00"
+        },
+        {
+          "Indoor": "2F-DS-06",
+          "Room": "APT-06",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "9.78",
+          "Sens Cool Cap": "8.76",
+          "Heat Cap": "",
+          "Air Flow Rate": "750.00"
+        },
+        {
+          "Indoor": "2F-DS-07",
+          "Room": "APT-07",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "9.78",
+          "Sens Cool Cap": "8.76",
+          "Heat Cap": "",
+          "Air Flow Rate": "750.00"
+        },
+        {
+          "Indoor": "2F-DS-08",
+          "Room": "APT-08",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "3.96",
+          "Sens Cool Cap": "3.64",
+          "Heat Cap": "",
+          "Air Flow Rate": "333.00"
+        },
+        {
+          "Indoor": "2F-DS-09",
+          "Room": "APT-09",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "3.96",
+          "Sens Cool Cap": "3.64",
+          "Heat Cap": "",
+          "Air Flow Rate": "333.00"
+        },
+        {
+          "Indoor": "2F-DS-10",
+          "Room": "APT-10",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "3.96",
+          "Sens Cool Cap": "3.64",
+          "Heat Cap": "",
+          "Air Flow Rate": "333.00"
+        },
+        {
+          "Indoor": "2F-DS-11",
+          "Room": "APT-11",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "3.96",
+          "Sens Cool Cap": "3.64",
+          "Heat Cap": "",
+          "Air Flow Rate": "333.00"
+        },
+        {
+          "Indoor": "2F-DS-12",
+          "Room": "APT-12",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "3.96",
+          "Sens Cool Cap": "3.64",
+          "Heat Cap": "",
+          "Air Flow Rate": "333.00"
+        },
+        {
+          "Indoor": "2F-DS-13",
+          "Room": "APT-13",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "9.78",
+          "Sens Cool Cap": "8.76",
+          "Heat Cap": "",
+          "Air Flow Rate": "750.00"
+        },
+        {
+          "Indoor": "2F-DS-14",
+          "Room": "APT-14",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "9.78",
+          "Sens Cool Cap": "8.76",
+          "Heat Cap": "",
+          "Air Flow Rate": "750.00"
+        },
+        {
+          "Indoor": "2F-DS-15",
+          "Room": "APT-15",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "4.98",
+          "Sens Cool Cap": "4.55",
+          "Heat Cap": "",
+          "Air Flow Rate": "375.00"
+        },
+        {
+          "Indoor": "2F-DS-16",
+          "Room": "APT-16",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "4.98",
+          "Sens Cool Cap": "4.55",
+          "Heat Cap": "",
+          "Air Flow Rate": "375.00"
+        },
+        {
+          "Indoor": "2F-DS-17A",
+          "Room": "APT-17 L&D",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "4.98",
+          "Sens Cool Cap": "4.55",
+          "Heat Cap": "",
+          "Air Flow Rate": "375.00"
+        },
+        {
+          "Indoor": "2F-DS-17B",
+          "Room": "APT-17 BEDROOM",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "3.96",
+          "Sens Cool Cap": "3.64",
+          "Heat Cap": "",
+          "Air Flow Rate": "333.00"
+        },
+        {
+          "Indoor": "2F-DS-18",
+          "Room": "CORRIDOR",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "6.63",
+          "Sens Cool Cap": "6.19",
+          "Heat Cap": "",
+          "Air Flow Rate": "472.00"
+        },
+        {
+          "Indoor": "TP-DS-01",
+          "Room": "APT-01",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "9.78",
+          "Sens Cool Cap": "8.76",
+          "Heat Cap": "",
+          "Air Flow Rate": "750.00"
+        },
+        {
+          "Indoor": "TP-DS-02",
+          "Room": "APT-02",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "9.78",
+          "Sens Cool Cap": "8.76",
+          "Heat Cap": "",
+          "Air Flow Rate": "750.00"
+        },
+        {
+          "Indoor": "TP-DS-03",
+          "Room": "APT-03",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "3.96",
+          "Sens Cool Cap": "3.64",
+          "Heat Cap": "",
+          "Air Flow Rate": "333.00"
+        },
+        {
+          "Indoor": "TP-DS-04",
+          "Room": "APT-04",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "3.96",
+          "Sens Cool Cap": "3.64",
+          "Heat Cap": "",
+          "Air Flow Rate": "333.00"
+        },
+        {
+          "Indoor": "TP-DS-05",
+          "Room": "APT-05",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "3.96",
+          "Sens Cool Cap": "3.64",
+          "Heat Cap": "",
+          "Air Flow Rate": "333.00"
+        },
+        {
+          "Indoor": "TP-DS-06",
+          "Room": "APT-06",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "9.78",
+          "Sens Cool Cap": "8.76",
+          "Heat Cap": "",
+          "Air Flow Rate": "750.00"
+        },
+        {
+          "Indoor": "TP-DS-07",
+          "Room": "APT-07",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "4.98",
+          "Sens Cool Cap": "4.55",
+          "Heat Cap": "",
+          "Air Flow Rate": "375.00"
+        },
+        {
+          "Indoor": "TP-DS-08",
+          "Room": "APT-08",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "4.98",
+          "Sens Cool Cap": "4.55",
+          "Heat Cap": "",
+          "Air Flow Rate": "375.00"
+        },
+        {
+          "Indoor": "TP-DS-09",
+          "Room": "APT-09",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "4.98",
+          "Sens Cool Cap": "4.55",
+          "Heat Cap": "",
+          "Air Flow Rate": "375.00"
+        },
+        {
+          "Indoor": "TP-DS-10",
+          "Room": "APT-10",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "4.98",
+          "Sens Cool Cap": "4.55",
+          "Heat Cap": "",
+          "Air Flow Rate": "375.00"
+        },
+        {
+          "Indoor": "TP-DS-11",
+          "Room": "APT-11",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "4.98",
+          "Sens Cool Cap": "4.55",
+          "Heat Cap": "",
+          "Air Flow Rate": "375.00"
+        },
+        {
+          "Indoor": "TP-DS-12",
+          "Room": "APT-12",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "4.98",
+          "Sens Cool Cap": "4.55",
+          "Heat Cap": "",
+          "Air Flow Rate": "375.00"
+        },
+        {
+          "Indoor": "TP-DS-13",
+          "Room": "APT-13",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "4.98",
+          "Sens Cool Cap": "4.55",
+          "Heat Cap": "",
+          "Air Flow Rate": "375.00"
+        },
+        {
+          "Indoor": "TP-DS-14",
+          "Room": "APT-14",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "9.78",
+          "Sens Cool Cap": "8.76",
+          "Heat Cap": "",
+          "Air Flow Rate": "750.00"
+        },
+        {
+          "Indoor": "TP-DS-15",
+          "Room": "APT-15",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "9.78",
+          "Sens Cool Cap": "8.76",
+          "Heat Cap": "",
+          "Air Flow Rate": "750.00"
+        },
+        {
+          "Indoor": "TP-DS-16",
+          "Room": "APT-16",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "4.98",
+          "Sens Cool Cap": "4.55",
+          "Heat Cap": "",
+          "Air Flow Rate": "375.00"
+        },
+        {
+          "Indoor": "TP-DS-17",
+          "Room": "APT-17",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "4.98",
+          "Sens Cool Cap": "4.55",
+          "Heat Cap": "",
+          "Air Flow Rate": "375.00"
+        },
+        {
+          "Indoor": "TP-DS-18A",
+          "Room": "APT-18 L&D",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "4.98",
+          "Sens Cool Cap": "4.55",
+          "Heat Cap": "",
+          "Air Flow Rate": "375.00"
+        },
+        {
+          "Indoor": "TP-DS-18B",
+          "Room": "APT-18 BEDROOM",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "3.96",
+          "Sens Cool Cap": "3.64",
+          "Heat Cap": "",
+          "Air Flow Rate": "333.00"
+        },
+        {
+          "Indoor": "TP-DS-19",
+          "Room": "CORRIDOR",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "6.63",
+          "Sens Cool Cap": "6.19",
+          "Heat Cap": "",
+          "Air Flow Rate": "472.00"
+        },
+        {
+          "Indoor": "5F-DS-01",
+          "Room": "APT-01",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "9.78",
+          "Sens Cool Cap": "8.76",
+          "Heat Cap": "",
+          "Air Flow Rate": "750.00"
+        },
+        {
+          "Indoor": "5F-DS-02",
+          "Room": "APT-02",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "9.78",
+          "Sens Cool Cap": "8.76",
+          "Heat Cap": "",
+          "Air Flow Rate": "750.00"
+        },
+        {
+          "Indoor": "5F-DS-03",
+          "Room": "APT-03",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "3.96",
+          "Sens Cool Cap": "3.64",
+          "Heat Cap": "",
+          "Air Flow Rate": "333.00"
+        },
+        {
+          "Indoor": "5F-DS-04",
+          "Room": "APT-04",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "3.96",
+          "Sens Cool Cap": "3.64",
+          "Heat Cap": "",
+          "Air Flow Rate": "333.00"
+        },
+        {
+          "Indoor": "5F-DS-05",
+          "Room": "APT-05",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "9.78",
+          "Sens Cool Cap": "8.76",
+          "Heat Cap": "",
+          "Air Flow Rate": "750.00"
+        },
+        {
+          "Indoor": "5F-DS-06",
+          "Room": "APT-06",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "9.78",
+          "Sens Cool Cap": "8.76",
+          "Heat Cap": "",
+          "Air Flow Rate": "750.00"
+        },
+        {
+          "Indoor": "5F-DS-07",
+          "Room": "APT-07",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "9.78",
+          "Sens Cool Cap": "8.76",
+          "Heat Cap": "",
+          "Air Flow Rate": "750.00"
+        },
+        {
+          "Indoor": "5F-DS-08",
+          "Room": "APT-08",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "9.78",
+          "Sens Cool Cap": "8.76",
+          "Heat Cap": "",
+          "Air Flow Rate": "750.00"
+        },
+        {
+          "Indoor": "5F-DS-09",
+          "Room": "APT-09",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "9.78",
+          "Sens Cool Cap": "8.76",
+          "Heat Cap": "",
+          "Air Flow Rate": "750.00"
+        },
+        {
+          "Indoor": "5F-DS-10",
+          "Room": "APT-10",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "9.78",
+          "Sens Cool Cap": "8.76",
+          "Heat Cap": "",
+          "Air Flow Rate": "750.00"
+        },
+        {
+          "Indoor": "5F-DS-11",
+          "Room": "APT-11",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "3.96",
+          "Sens Cool Cap": "3.64",
+          "Heat Cap": "",
+          "Air Flow Rate": "333.00"
+        },
+        {
+          "Indoor": "5F-DS-12A",
+          "Room": "APT-12 L&D",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "6.63",
+          "Sens Cool Cap": "6.19",
+          "Heat Cap": "",
+          "Air Flow Rate": "472.00"
+        },
+        {
+          "Indoor": "5F-DS-12B",
+          "Room": "APT-12 BEDROOM",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "3.96",
+          "Sens Cool Cap": "3.64",
+          "Heat Cap": "",
+          "Air Flow Rate": "333.00"
+        },
+        {
+          "Indoor": "5F-DS-13",
+          "Room": "CORRIDOR",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "6.63",
+          "Sens Cool Cap": "6.19",
+          "Heat Cap": "",
+          "Air Flow Rate": "472.00"
+        },
+        {
+          "Indoor": "RF-DS-01",
+          "Room": "GSM ROOM",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "4.44",
+          "Sens Cool Cap": "4.11",
+          "Heat Cap": "",
+          "Air Flow Rate": "241.00"
+        },
+        {
+          "Indoor": "RF-DS-02",
+          "Room": "ELECTRICAL ROOM",
+          "Mode": "A",
+          "Family or Model": "FXAQ",
+          "Cooling DBT": "24.4",
+          "Cooling WBT": "17.2",
+          "Heating T": "20",
+          "Tot Cool Cap": "4.44",
+          "Sens Cool Cap": "4.11",
+          "Heat Cap": "",
+          "Air Flow Rate": "241.00"
+        }
+      ]
     },
     "costing": {
       "columns": [
@@ -157,7 +1263,7 @@
           "Multiplier": 0.5,
           "Cost": 27142.5,
           "Amount": 54285,
-          "Selling Price / Unit": 29856.75
+          "Selling Price / Unit": 35285.25
         },
         {
           "S.No": 2,
@@ -168,29 +1274,29 @@
           "Multiplier": 0.5,
           "Cost": 15180,
           "Amount": 15180,
-          "Selling Price / Unit": 16698
+          "Selling Price / Unit": 19734
         },
         {
           "S.No": 3,
           "Model": "RXYTQ14U5YF",
           "Qty": 1,
-          "TR": "11.21",
+          "TR": 11.2,
           "List Price": 52544,
           "Multiplier": 0.5,
           "Cost": 26272,
           "Amount": 26272,
-          "Selling Price / Unit": 28899.2
+          "Selling Price / Unit": 34153.6
         },
         {
           "S.No": 4,
           "Model": "RXYTQ12U5YF",
           "Qty": 3,
-          "TR": "9.6",
+          "TR": 9.6,
           "List Price": 43196,
           "Multiplier": 0.5,
           "Cost": 21598,
           "Amount": 64794,
-          "Selling Price / Unit": 23757.8
+          "Selling Price / Unit": 28077.4
         },
         {
           "S.No": 5,
@@ -201,7 +1307,7 @@
           "Multiplier": 0.55,
           "Cost": 2473.9,
           "Amount": 22265.1,
-          "Selling Price / Unit": 2721.29
+          "Selling Price / Unit": 3216.07
         },
         {
           "S.No": 6,
@@ -212,7 +1318,7 @@
           "Multiplier": 0.55,
           "Cost": 2549.8,
           "Amount": 2549.8,
-          "Selling Price / Unit": 2804.78
+          "Selling Price / Unit": 3314.74
         },
         {
           "S.No": 7,
@@ -223,7 +1329,7 @@
           "Multiplier": 0.55,
           "Cost": 3275.25,
           "Amount": 16376.25,
-          "Selling Price / Unit": 3602.78
+          "Selling Price / Unit": 4257.83
         },
         {
           "S.No": 8,
@@ -234,7 +1340,7 @@
           "Multiplier": 0.55,
           "Cost": 3374.8,
           "Amount": 16874,
-          "Selling Price / Unit": 3712.28
+          "Selling Price / Unit": 4387.24
         },
         {
           "S.No": 9,
@@ -245,7 +1351,7 @@
           "Multiplier": 0.55,
           "Cost": 3846.7,
           "Amount": 42313.7,
-          "Selling Price / Unit": 4231.37
+          "Selling Price / Unit": 5000.71
         },
         {
           "S.No": 10,
@@ -256,7 +1362,7 @@
           "Multiplier": 0.65,
           "Cost": 471.9,
           "Amount": 1415.7,
-          "Selling Price / Unit": 519.09
+          "Selling Price / Unit": 613.47
         },
         {
           "S.No": 11,
@@ -267,7 +1373,7 @@
           "Multiplier": 0.65,
           "Cost": 523.25,
           "Amount": 3139.5,
-          "Selling Price / Unit": 575.58
+          "Selling Price / Unit": 680.23
         },
         {
           "S.No": 12,
@@ -278,7 +1384,7 @@
           "Multiplier": 0.65,
           "Cost": 689.65,
           "Amount": 9655.1,
-          "Selling Price / Unit": 758.62
+          "Selling Price / Unit": 896.55
         },
         {
           "S.No": 13,
@@ -289,7 +1395,7 @@
           "Multiplier": 0.65,
           "Cost": 1444.95,
           "Amount": 7224.75,
-          "Selling Price / Unit": 1589.45
+          "Selling Price / Unit": 1878.44
         },
         {
           "S.No": 14,
@@ -300,7 +1406,7 @@
           "Multiplier": 0.65,
           "Cost": 730.6,
           "Amount": 1461.2,
-          "Selling Price / Unit": 803.66
+          "Selling Price / Unit": 949.78
         },
         {
           "S.No": 15,
@@ -311,7 +1417,7 @@
           "Multiplier": 0.65,
           "Cost": 1419.6,
           "Amount": 1419.6,
-          "Selling Price / Unit": 1561.56
+          "Selling Price / Unit": 1845.48
         },
         {
           "S.No": 16,
@@ -326,12 +1432,12 @@
         }
       ],
       "summary": {
-        "totalTR": 72.01,
+        "totalTR": 72,
         "totalCost": 285225.7,
-        "margin": 0.1,
-        "sellingPrice": 313748.27,
-        "profit": 28522.57,
-        "pricePerTon": 4357.01
+        "margin": 0.3,
+        "sellingPrice": 370793.41,
+        "profit": 85567.71,
+        "pricePerTon": 5149.91
       }
     },
     "boq": {
@@ -440,9 +1546,9 @@
         }
       ],
       "summary": {
-        "total": 313748.27,
-        "vat": 15687.41,
-        "netAmount": 329435.68
+        "total": 370793.41,
+        "vat": 18539.67,
+        "netAmount": 389333.08
       }
     },
     "vrvSchedule": {
@@ -4153,6 +5259,129 @@
       }
     ]
   },
+  "visible": true,
+  "thermalChatSelection": {
+    "mode": "regular",
+    "capacitySource": "First Selection",
+    "familyModel": "FXAQ",
+    "customInstruction": "",
+    "requested": true,
+    "appendResults": false
+  },
+  "thermalChatMessages": [
+    {
+      "kind": "file",
+      "name": "Data Unit's-2.pdf",
+      "size": 15382285
+    },
+    {
+      "kind": "text",
+      "role": "assistant",
+      "text": "What do you want to extract?"
+    },
+    {
+      "kind": "text",
+      "role": "assistant",
+      "text": "For the regular VRV export, reply like: VRV first selection. Mention a model only if you want it filled."
+    },
+    {
+      "kind": "text",
+      "role": "assistant",
+      "text": "For any other table, tell me the table or columns, for example: extract columns Indoor, Room, Air Flow Rate."
+    },
+    {
+      "kind": "text",
+      "role": "user",
+      "text": "VRV Export, First Selection, model FXAQ"
+    },
+    {
+      "kind": "text",
+      "role": "assistant",
+      "text": "Ok, I will use the regular VRV template with First Selection, model FXAQ. Reading the file now."
+    },
+    {
+      "kind": "text",
+      "role": "assistant",
+      "text": "Selected First Selection, model FXAQ."
+    },
+    {
+      "kind": "text",
+      "role": "assistant",
+      "text": "Extracting values into the Export File table..."
+    },
+    {
+      "kind": "text",
+      "role": "assistant",
+      "text": "Detected source options: Calculated AC Load, First Selection, Second Selection. Reply with the one you want to use."
+    },
+    {
+      "kind": "text",
+      "role": "assistant",
+      "text": "Extracted data from First Selection capacity source with family model FXAQ."
+    },
+    {
+      "kind": "file",
+      "name": "Screenshot 2026-06-27 110844.png",
+      "size": 1118525
+    },
+    {
+      "kind": "file",
+      "name": "Screenshot 2026-06-27 110901.png",
+      "size": 655718
+    },
+    {
+      "kind": "file",
+      "name": "Screenshot 2026-06-27 110919.png",
+      "size": 696844
+    },
+    {
+      "kind": "file",
+      "name": "Screenshot 2026-06-27 110943.png",
+      "size": 589735
+    },
+    {
+      "kind": "text",
+      "role": "assistant",
+      "text": "Files added. Should I verify the table again using these screenshot(s)? Reply: verify again."
+    },
+    {
+      "kind": "text",
+      "role": "user",
+      "text": "verify"
+    },
+    {
+      "kind": "text",
+      "role": "assistant",
+      "text": "Ok, I will verify/regenerate using First Selection, model FXAQ."
+    },
+    {
+      "kind": "text",
+      "role": "assistant",
+      "text": "Selected First Selection, model FXAQ."
+    },
+    {
+      "kind": "text",
+      "role": "assistant",
+      "text": "Extracting values into the Export File table..."
+    },
+    {
+      "kind": "text",
+      "role": "assistant",
+      "text": "Detected source options: Calculated AC Load, First Selection. Reply with the one you want to use."
+    },
+    {
+      "kind": "text",
+      "role": "assistant",
+      "text": "Extraction completed with high confidence; no unclear fields detected."
+    }
+  ],
+  "thermalChatUploadIds": [
+    "6aa03ae0-fe16-4b7e-9290-f156924cd286",
+    "3f5970e9-3428-4270-b2f5-93c54388df11",
+    "4f07a3ef-587c-4f3f-8592-54983970613d",
+    "ba6f4a10-7238-4a0d-82e1-0b0e9c6c439c"
+  ],
+  "thermalPendingUploadIds": [],
   "extracted": {
     "vrv": {
       "status": "ok",
@@ -4439,6 +5668,5 @@
       "projectName": "PRIVATE VILLA, PLOT NO. 3323866, LA MER, JUMEIRA FIRST, DUBAI",
       "message": "VRV report extracted."
     }
-  },
-  "visible": true
+  }
 }

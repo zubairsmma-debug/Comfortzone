@@ -6,7 +6,7 @@
     "phone": "0561772530",
     "email": "info@comfortzoneuae.com",
     "website": "www.comfortzoneuae.com",
-    "logoUploadId": "49002d1e-311d-46cf-8f8d-b8e46a9e6057"
+    "logoUploadId": "0215ea8c-316f-4c05-89b5-63ba330d01e0"
   },
   "company2": {
     "name": "Al Mahira Technical Services",
@@ -28,6 +28,15 @@
     }
   ],
   "attachments": [
+    {
+      "id": "0215ea8c-316f-4c05-89b5-63ba330d01e0",
+      "originalName": "Comfot zone Logo.jpeg",
+      "storedName": "0215ea8c-316f-4c05-89b5-63ba330d01e0-Comfot zone Logo.jpeg",
+      "mimeType": "image/jpeg",
+      "size": 32005,
+      "category": "Logo",
+      "createdAt": "2026-06-26T10:45:22.876Z"
+    },
     {
       "id": "49002d1e-311d-46cf-8f8d-b8e46a9e6057",
       "originalName": "Comfot zone Logo.jpeg",

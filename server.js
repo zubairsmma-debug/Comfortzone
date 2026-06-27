@@ -13,6 +13,8 @@ try {
   PDFDocument = require("pdfkit");
 } catch {}
 
+loadLocalEnv();
+
 const PORT = process.env.PORT || 4173;
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4.1-mini";
 const ROOT = __dirname;
@@ -39,6 +41,24 @@ const SUPABASE_BUCKET = process.env.SUPABASE_BUCKET || "comfortzone-files";
 const DEFAULT_PURCHASE_NOTES = `1. Invoice should be attached with delivery note signed by site supervisor.
 2. Attach LPO copy along with invoice.
 3. Delivery to be made as per schedule instruction provided to you.`;
+
+function loadLocalEnv() {
+  const envPath = path.join(__dirname, ".env");
+  if (!fs.existsSync(envPath)) return;
+  const lines = fs.readFileSync(envPath, "utf8").split(/\r?\n/);
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const splitIndex = trimmed.indexOf("=");
+    if (splitIndex <= 0) continue;
+    const key = trimmed.slice(0, splitIndex).trim();
+    let value = trimmed.slice(splitIndex + 1).trim();
+    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+      value = value.slice(1, -1);
+    }
+    if (!process.env[key]) process.env[key] = value;
+  }
+}
 
 if ((SUPABASE_URL || SUPABASE_KEY) && !createClient) {
   throw new Error("Supabase environment variables are set, but @supabase/supabase-js is not installed.");
@@ -620,7 +640,7 @@ async function createDefaultProject() {
       preparedBy: ""
     },
     quotation: { quotationNo: await nextQuotationNo(), generatedDocId: "", generatedPdfId: "" },
-    layoutVersion: "screenshot-v3",
+    layoutVersion: "screenshot-v5",
     nodes: defaultNodes(),
     uploads: [],
     tables: {
@@ -651,13 +671,13 @@ async function nextQuotationNo() {
 function defaultNodes() {
   return [
     { id: "details", type: "projectDetails", title: "Project / Client Details", x: 0, y: 0, locked: false, data: {} },
-    { id: "thermal-upload", type: "thermalUpload", title: "Thermal Sheet", x: 145, y: 250, locked: false, data: {} },
-    { id: "vrv-upload", type: "vrvUpload", title: "VRV Selection Report", x: 860, y: 6, locked: false, data: {} },
-    { id: "thermal-table", type: "thermalTable", title: "Export File", x: 10, y: 470, locked: false, width: 620, height: 260, data: {} },
-    { id: "costing-table", type: "costingTable", title: "Costing Sheet", x: 725, y: 300, locked: false, width: 790, height: 270, data: {} },
-    { id: "boq-table", type: "boqTable", title: "BOQ / Price", x: 725, y: 545, locked: false, width: 790, height: 235, data: {} },
-    { id: "quotation", type: "quotation", title: "Quotation", x: 1605, y: 485, locked: false, data: {} },
-    { id: "vrv-schedule", type: "vrvSchedule", title: "VRV Schedule", x: 20, y: 815, locked: false, width: 1880, height: 260, data: {} }
+    { id: "thermal-upload", type: "thermalUpload", title: "Thermal Sheet", x: 180, y: 255, locked: false, data: {} },
+    { id: "vrv-upload", type: "vrvUpload", title: "VRV Selection Report", x: 640, y: 250, locked: false, data: {} },
+    { id: "thermal-table", type: "thermalTable", title: "Export File", x: 55, y: 520, locked: false, width: 520, height: 205, data: {} },
+    { id: "costing-table", type: "costingTable", title: "Costing Sheet", x: 980, y: 130, locked: false, width: 650, height: 220, data: {} },
+    { id: "boq-table", type: "boqTable", title: "BOQ / Price", x: 970, y: 430, locked: false, width: 650, height: 190, data: {} },
+    { id: "quotation", type: "quotation", title: "Quotation", x: 1680, y: 340, locked: false, data: {} },
+    { id: "vrv-schedule", type: "vrvSchedule", title: "VRV Schedule", x: 170, y: 770, locked: false, width: 1550, height: 230, data: {} }
   ];
 }
 
@@ -1218,7 +1238,15 @@ async function handleApi(req, res) {
     store.uploads.unshift({ id: uploadId, originalName: filePart.filename, storedName, mimeType: filePart.mimeType, size: filePart.body.length, createdAt: new Date().toISOString() });
     await writePurchaseOrders(store);
     const extracted = await extractPurchaseQuotationWithOpenAI(filePart).catch(error => ({ message: error.message, items: [] }));
-    const order = normalizePurchaseOrder({ ...extracted, sourceUploadId: uploadId, status: "Draft" }, store, false);
+    const extractedSubtotal = Number(String(extracted.manualSubtotal ?? extracted.subtotal ?? "").replace(/,/g, "")) || 0;
+    const order = normalizePurchaseOrder({
+      ...extracted,
+      manualSubtotal: extractedSubtotal > 0 ? extractedSubtotal : "",
+      discount: extracted.discount ?? 0,
+      notes: DEFAULT_PURCHASE_NOTES,
+      sourceUploadId: uploadId,
+      status: "Draft"
+    }, store, false);
     order.id = "";
     order.poNo = "";
     return send(res, 200, { order, message: extracted.message || "Quotation scanned. Review and edit before creating the PO." });
@@ -1538,9 +1566,9 @@ async function handleApi(req, res) {
       return send(res, 200, {
         status: "ready_for_options",
         capacitySources: ["Calculated AC Load", "First Selection", "Second Selection"],
-        familyModels: ["FXSQ-A", "FXMQ-PbV1", "Other"],
+        familyModels: [],
         rows: [],
-        message: "Thermal sheet uploaded. Select the capacity source and model, then click Extract Table. Add zoomed screenshots first if any values are unclear."
+        message: "Thermal sheet uploaded. Select the capacity source, and mention a model/family only if it should be filled. Add zoomed screenshots first if any values are unclear."
       });
     }
 
@@ -1681,11 +1709,15 @@ async function extractThermalWithOpenAI(project, options) {
     return { status: "parse_error", rows: [], unclearFields: [], message: "OpenAI returned an unreadable extraction response." };
   }
 
-  const rows = (parsed.rows || []).map(row => ({
+  const customColumns = Array.isArray(parsed.customColumns) ? parsed.customColumns.map(safeExtract).filter(Boolean) : [];
+  const customRows = Array.isArray(parsed.customRows)
+    ? parsed.customRows.map(row => (Array.isArray(row.cells) ? row.cells.map(safeExtract) : []))
+    : [];
+  const rows = options.customExtraction ? [] : (parsed.rows || []).map(row => ({
     "Indoor": safeExtract(row.indoor),
     "Room": safeExtract(row.room),
     "Mode": "A",
-    "Family or Model": options.familyModel || parsed.familyModel || "FXSQ-A",
+    "Family or Model": options.familyModel || parsed.familyModel || "",
     "Cooling DBT": "24.4",
     "Cooling WBT": "17.2",
     "Heating T": "20",
@@ -1701,12 +1733,34 @@ async function extractThermalWithOpenAI(project, options) {
     selectedCapacitySource: options.capacitySource || parsed.selectedCapacitySource || "",
     familyModel: options.familyModel || parsed.familyModel || "",
     rows,
+    customColumns,
+    customRows,
     unclearFields: parsed.unclearFields || [],
-    message: parsed.message || (rows.length ? "Thermal values extracted into the Export File table." : "No rows were detected.")
+    message: parsed.message || (customRows.length ? "Requested table columns were extracted into the Export File table." : rows.length ? "Thermal values extracted into the Export File table." : "No rows were detected.")
   };
 }
 
 function thermalPrompt(options) {
+  if (options.customExtraction) {
+    return `
+You are an accurate table extraction assistant for scanned PDFs and screenshots.
+
+The user wants a custom table extraction, not the regular VRV thermal export template.
+User request:
+${options.customInstruction || "Extract the requested table and columns."}
+
+Rules:
+- Extract only the table(s), columns, and rows requested by the user.
+- If the user asks for specific columns, return only those columns in customColumns, in the requested order.
+- If the user asks for a particular table but not exact columns, return the visible table columns.
+- Preserve row order exactly.
+- Preserve values exactly as shown; do not round, correct, merge, or deduplicate.
+- If OCR confidence is uncertain, leave that cell as an empty string and list it in unclearFields.
+- Never guess, infer, or hallucinate unclear values.
+- Leave the regular rows array empty for custom extraction.
+- Set capacitySources to [], selectedCapacitySource to "", and familyModel to "".
+- Return JSON only.`;
+  }
   return `
 You are an HVAC Schedule Extractor specialized in scanned Thermal Load Sheets.
 Priority is extraction accuracy, especially for numeric values.
@@ -1718,7 +1772,7 @@ Follow this workflow:
 - Include all units.
 - Detect capacity sources containing both Total kW and Sensible kW.
 - Capacity source selected by user: ${options.capacitySource || "auto if only one exists"}.
-- Family or Model selected by user: ${options.familyModel || "FXSQ-A"}.
+- Family or Model selected by user: ${options.familyModel || "not specified; leave Family or Model blank"}.
 
 Extract these source fields when available:
 - Unit Reference No.
@@ -1741,7 +1795,8 @@ Numeric accuracy rules:
 - Never truncate trailing zeros.
 - Never remove decimal points.
 - Do not infer missing digits.
-- If OCR confidence is uncertain, use exactly "[Verification Required]" for that cell and list it in unclearFields.
+- If OCR confidence is uncertain, leave that cell as an empty string and list it in unclearFields.
+- Never guess, infer, or hallucinate unclear values.
 
 If screenshots are uploaded with the PDF, use screenshots to clarify unreadable values.
 Return JSON only.`;
@@ -1770,10 +1825,22 @@ function thermalJsonSchema() {
           required: ["indoor", "room", "totCoolCap", "sensCoolCap", "airFlowRate"]
         }
       },
+      customColumns: { type: "array", items: { type: "string" } },
+      customRows: {
+        type: "array",
+        items: {
+          type: "object",
+          additionalProperties: false,
+          properties: {
+            cells: { type: "array", items: { type: "string" } }
+          },
+          required: ["cells"]
+        }
+      },
       unclearFields: { type: "array", items: { type: "string" } },
       message: { type: "string" }
     },
-    required: ["capacitySources", "selectedCapacitySource", "familyModel", "rows", "unclearFields", "message"]
+    required: ["capacitySources", "selectedCapacitySource", "familyModel", "rows", "customColumns", "customRows", "unclearFields", "message"]
   };
 }
 
@@ -1952,6 +2019,18 @@ function normalizePurchaseSupplier(input = {}) {
   };
 }
 
+function normalizePurchasePaymentTerms(value) {
+  const text = cleanCell(value);
+  const lower = text.toLowerCase();
+  if (!text) return "";
+  if (/\b(cash|cdc|c\.d\.c|current\s+dated)\b/.test(lower)) return "CDC";
+  if (/\b15\b/.test(lower) && /\b(day|days|pdc)\b/.test(lower)) return "15 Days PDC";
+  if (/\b30\b/.test(lower) && /\b(day|days|pdc)\b/.test(lower)) return "30 Days PDC";
+  if (/\b60\b/.test(lower) && /\b(day|days|pdc)\b/.test(lower)) return "60 Days PDC";
+  if (/\b90\b/.test(lower) && /\b(day|days|pdc)\b/.test(lower)) return "90 Days PDC";
+  return text;
+}
+
 function normalizePurchaseOrder(input = {}, store = defaultPurchaseOrders(), createOfficial = false) {
   const now = new Date().toISOString();
   const order = {
@@ -1967,8 +2046,9 @@ function normalizePurchaseOrder(input = {}, store = defaultPurchaseOrders(), cre
     poDate: parseServerDate(input.poDate) || todayISO(),
     projectName: cleanCell(input.projectName),
     deliveryTerms: cleanCell(input.deliveryTerms),
-    paymentTerms: cleanCell(input.paymentTerms),
+    paymentTerms: normalizePurchasePaymentTerms(input.paymentTerms),
     manualSubtotal: cleanCell(input.manualSubtotal),
+    discount: Number(String(input.discount || "").replace(/,/g, "")) || 0,
     notes: cleanMultilineCell(input.notes) || DEFAULT_PURCHASE_NOTES,
     sourceUploadId: input.sourceUploadId || "",
     createdAt: input.createdAt || now,
@@ -1981,15 +2061,37 @@ function normalizePurchaseOrder(input = {}, store = defaultPurchaseOrders(), cre
 }
 
 function normalizePurchaseItem(item = {}) {
+  const modelNo = cleanCell(item.modelNo || item.modelNumber || item.model);
+  const description = combinePurchaseDescriptionParts([
+    item.description || item.itemDescription || item.item,
+    item.size || item.dimension || item.dimensions,
+    modelNo,
+    item.remarks || item.remark || item.notes
+  ]);
   return {
     id: item.id || id(),
-    description: cleanCell(item.description || item.itemDescription || item.item),
-    modelNo: cleanCell(item.modelNo || item.modelNumber || item.model),
+    description,
+    modelNo,
     qty: Number(item.qty || item.quantity || 0),
     unitPrice: Number(item.unitPrice || item.unitPriceAed || item.rate || 0),
     vatPercent: Number(item.vatPercent ?? item.vat ?? item.vatPercentage ?? 5),
     amount: Number(item.amount || 0)
   };
+}
+
+function combinePurchaseDescriptionParts(parts = []) {
+  const output = [];
+  for (const raw of parts) {
+    const part = cleanCell(raw);
+    if (!part) continue;
+    const normalizedPart = part.toLowerCase().replace(/\s+/g, " ").trim();
+    const alreadyIncluded = output.some(existing => {
+      const normalizedExisting = existing.toLowerCase().replace(/\s+/g, " ").trim();
+      return normalizedExisting === normalizedPart || normalizedExisting.includes(normalizedPart);
+    });
+    if (!alreadyIncluded) output.push(part);
+  }
+  return output.join(" - ");
 }
 
 function recalcPurchaseOrderServer(order) {
@@ -2005,9 +2107,12 @@ function recalcPurchaseOrderServer(order) {
   const hasManualSubtotal = String(order.manualSubtotal || "").trim() !== "";
   const finalSubtotal = hasManualSubtotal ? Number(String(order.manualSubtotal).replace(/,/g, "")) || 0 : subtotal;
   const vatRate = subtotal > 0 ? vatTotal / subtotal : averagePurchaseVatRate(order.items);
+  const discount = Number(String(order.discount || "").replace(/,/g, "")) || 0;
+  const taxable = Math.max(0, finalSubtotal - discount);
   order.subtotal = finalSubtotal;
-  order.vatTotal = finalSubtotal * vatRate;
-  order.grandTotal = order.subtotal + order.vatTotal;
+  order.discount = discount;
+  order.vatTotal = taxable * vatRate;
+  order.grandTotal = taxable + order.vatTotal;
 }
 
 function averagePurchaseVatRate(items = []) {
@@ -2196,7 +2301,7 @@ async function extractPurchaseQuotationWithOpenAI(filePart) {
   const base64 = filePart.body.toString("base64");
   const content = [{
     type: "input_text",
-    text: "Extract supplier quotation details for a purchase order. Return blank strings for missing values. Never invent values. Extract supplierName, supplierAddress, trn, quotationNo, quotationDate, projectName, paymentTerms, notes, and item rows with description, modelNo, qty, unitPrice, vatPercent, amount. Return JSON only."
+    text: "Extract supplier quotation details for a purchase order. Return blank strings for missing text values and 0 for missing numeric totals. Never invent values. Extract supplierName, supplierAddress, trn, quotationNo, quotationDate, projectName, paymentTerms, subtotal before VAT, discount if shown, and item rows with description, modelNo, qty, unitPrice, vatPercent, amount. Do not extract or change PO notes; return notes as an empty string. For paymentTerms, normalize cash/CDC/current dated cheque as CDC; 30 days as 30 Days PDC; 60 days as 60 Days PDC; 90 days as 90 Days PDC; 15 days as 15 Days PDC. For each item, combine every description-adjacent/specification column into the description field: Description, Size, Model, Type, Brand, Remarks, Specification, or any similar column next to description must become one description line joined with ' - '. Example: Description VCD, Size 1000 x 1000 mm, Model TAO => description 'VCD - 1000 x 1000 mm - TAO'. Keep qty, unit price, VAT, and amount separate as usual. Return JSON only."
   }];
   if (mime.startsWith("image/")) content.push({ type: "input_image", image_url: `data:${mime};base64,${base64}` });
   else content.push({ type: "input_file", filename: filePart.filename, file_data: `data:${mime};base64,${base64}` });
@@ -2233,6 +2338,8 @@ function purchaseQuotationSchema() {
       projectName: { type: "string" },
       paymentTerms: { type: "string" },
       notes: { type: "string" },
+      subtotal: { type: "number" },
+      discount: { type: "number" },
       items: {
         type: "array",
         items: {
@@ -2251,7 +2358,7 @@ function purchaseQuotationSchema() {
       },
       message: { type: "string" }
     },
-    required: ["supplierName", "supplierAddress", "trn", "quotationNo", "quotationDate", "projectName", "paymentTerms", "notes", "items", "message"]
+    required: ["supplierName", "supplierAddress", "trn", "quotationNo", "quotationDate", "projectName", "paymentTerms", "notes", "subtotal", "discount", "items", "message"]
   };
 }
 
@@ -2874,10 +2981,11 @@ function esc(value) {
 }
 
 function tableWorkbookHtml(title, columns, rows, summaryRows) {
-  const head = columns.map(col => `<th>${esc(col)}</th>`).join("");
+  const head = columns.map(col => `<td><b>${esc(col)}</b></td>`).join("");
   const body = rows.map(row => `<tr>${columns.map(col => `<td>${esc(row[col])}</td>`).join("")}</tr>`).join("");
-  const summary = summaryRows.map(row => `<tr>${columns.slice(0, -2).map(() => "<td></td>").join("")}<td><b>${esc(row.label)}</b></td><td><b>${esc(row.value)}</b></td></tr>`).join("");
-  return `<!doctype html><html><head><meta charset="utf-8"><style>table{border-collapse:collapse}th,td{border:1px solid #333;padding:5px}th{background:#d9d9d9}</style></head><body><h2>${esc(title)}</h2><table><thead><tr>${head}</tr></thead><tbody>${body}${summary}</tbody></table></body></html>`;
+  const summaryPad = Math.max(columns.length - 2, 0);
+  const summary = summaryRows.map(row => `<tr>${Array.from({ length: summaryPad }, () => "<td></td>").join("")}<td><b>${esc(row.label)}</b></td><td><b>${esc(row.value)}</b></td></tr>`).join("");
+  return `<!doctype html><html><head><meta charset="utf-8"><meta name="ProgId" content="Excel.Sheet"><style>table{border-collapse:collapse}td{border:1px solid #d9d9d9;padding:2px 4px;vertical-align:top}</style></head><body><table><tbody><tr>${head}</tr>${body}${summary}</tbody></table></body></html>`;
 }
 
 function quotationHtml(payload) {
